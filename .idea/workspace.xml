@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6eaaa009-da80-48ae-a916-fd3e9d4d515c" name="Default Changelist" comment="">
+    <list default="true" id="6eaaa009-da80-48ae-a916-fd3e9d4d515c" name="Default Changelist" comment="Optimalisation">
+      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/deploy.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/docker-compose.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/start.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/user_data/configs/blacklist-kucoin.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/user_data/configs/config.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/user_data/configs/pairlist-volume-kucoin-usdt.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/user_data/strategies/DcaBasedStrategyRsi30.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/user_data/strategies/DcaBasedStrategyRsi40.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/user_data/strategies/DcaBasedStrategyRsi50.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_data/strategies/DcaBasedStrategy.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_data/strategies/DcaBasedStrategy.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -140,9 +149,9 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.main DcaBasedStrategy" />
-      <item itemvalue="Python.main install-ui" />
       <item itemvalue="Docker.docker-compose.yml.freqtradeStrategyMKACustomSell_05: Compose Deployment" />
+      <item itemvalue="Python.main install-ui" />
+      <item itemvalue="Python.main DcaBasedStrategy" />
     </list>
     <recent_temporary>
       <list>
@@ -199,10 +208,22 @@
       <workItem from="1647891363738" duration="405000" />
       <workItem from="1647892245372" duration="996000" />
     </task>
+    <task id="LOCAL-00001" summary="Optimalisation">
+      <created>1647900188947</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1647900188947</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Optimalisation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Optimalisation" />
   </component>
   <component name="WindowStateProjectService">
     <state x="192" y="414" width="1089" height="737" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1647892567608">
@@ -224,6 +245,10 @@
     </state>
     <state width="1934" height="387" key="DebuggerActiveHint/0.0.2560.1400@0.0.2560.1400" timestamp="1645450884222" />
     <state width="1929" height="466" key="DebuggerActiveHint/0.0.3072.1688@0.0.3072.1688" timestamp="1647123474661" />
+    <state x="150" y="120" width="1950" height="1134" key="DiffContextDialog" timestamp="1647901263946">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="150" y="120" width="1950" height="1134" key="DiffContextDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1647901263946" />
     <state x="556" y="623" key="FileChooserDialogImpl" timestamp="1643275325276">
       <screen x="0" y="0" width="3072" height="1688" />
     </state>
@@ -236,50 +261,54 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="863" y="391" key="Github.UntrackedFilesDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1647892358784" />
-    <state width="1691" height="658" key="GridCell.Tab.0.bottom" timestamp="1647892621956">
+    <state width="1690" height="658" key="GridCell.Tab.0.bottom" timestamp="1647900336790">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1691" height="658" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1647892621956" />
+    <state width="1690" height="658" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1647900336790" />
     <state width="2045" height="577" key="GridCell.Tab.0.bottom/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008878" />
-    <state width="1691" height="658" key="GridCell.Tab.0.center" timestamp="1647892621956">
+    <state width="1690" height="658" key="GridCell.Tab.0.center" timestamp="1647900336789">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1691" height="658" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1647892621956" />
+    <state width="1690" height="658" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1647900336789" />
     <state width="2045" height="577" key="GridCell.Tab.0.center/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008878" />
-    <state width="1691" height="658" key="GridCell.Tab.0.left" timestamp="1647892621956">
+    <state width="1690" height="658" key="GridCell.Tab.0.left" timestamp="1647900336789">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1691" height="658" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1647892621956" />
+    <state width="1690" height="658" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1647900336789" />
     <state width="2045" height="577" key="GridCell.Tab.0.left/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008878" />
-    <state width="1691" height="658" key="GridCell.Tab.0.right" timestamp="1647892621956">
+    <state width="1690" height="658" key="GridCell.Tab.0.right" timestamp="1647900336789">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1691" height="658" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1647892621956" />
+    <state width="1690" height="658" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1647900336789" />
     <state width="2045" height="577" key="GridCell.Tab.0.right/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008878" />
-    <state width="1691" height="658" key="GridCell.Tab.1.bottom" timestamp="1647892624312">
+    <state width="1691" height="658" key="GridCell.Tab.1.bottom" timestamp="1647900336676">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1691" height="658" key="GridCell.Tab.1.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1647892624312" />
+    <state width="1691" height="658" key="GridCell.Tab.1.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1647900336676" />
     <state width="2045" height="577" key="GridCell.Tab.1.bottom/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008755" />
-    <state width="1691" height="658" key="GridCell.Tab.1.center" timestamp="1647892624312">
+    <state width="1691" height="658" key="GridCell.Tab.1.center" timestamp="1647900336676">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1691" height="658" key="GridCell.Tab.1.center/0.0.2560.1400@0.0.2560.1400" timestamp="1647892624312" />
+    <state width="1691" height="658" key="GridCell.Tab.1.center/0.0.2560.1400@0.0.2560.1400" timestamp="1647900336676" />
     <state width="2045" height="577" key="GridCell.Tab.1.center/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008755" />
-    <state width="1691" height="658" key="GridCell.Tab.1.left" timestamp="1647892624312">
+    <state width="1691" height="658" key="GridCell.Tab.1.left" timestamp="1647900336676">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1691" height="658" key="GridCell.Tab.1.left/0.0.2560.1400@0.0.2560.1400" timestamp="1647892624312" />
+    <state width="1691" height="658" key="GridCell.Tab.1.left/0.0.2560.1400@0.0.2560.1400" timestamp="1647900336676" />
     <state width="2045" height="577" key="GridCell.Tab.1.left/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008755" />
-    <state width="1691" height="658" key="GridCell.Tab.1.right" timestamp="1647892624312">
+    <state width="1691" height="658" key="GridCell.Tab.1.right" timestamp="1647900336676">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1691" height="658" key="GridCell.Tab.1.right/0.0.2560.1400@0.0.2560.1400" timestamp="1647892624312" />
+    <state width="1691" height="658" key="GridCell.Tab.1.right/0.0.2560.1400@0.0.2560.1400" timestamp="1647900336676" />
     <state width="2045" height="577" key="GridCell.Tab.1.right/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008755" />
     <state x="931" y="458" key="SettingsEditor" timestamp="1647290183195">
       <screen x="0" y="0" width="3072" height="1688" />
     </state>
     <state x="931" y="458" key="SettingsEditor/0.0.3072.1688@0.0.3072.1688" timestamp="1647290183195" />
+    <state x="718" y="420" key="Vcs.Push.Dialog.v2" timestamp="1647900194409">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="718" y="420" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1647900194409" />
     <state width="848" height="700" key="XDebugger.FullValuePopup" timestamp="1644964697384">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -325,7 +354,7 @@
     <SUITE FILE_PATH="coverage/FreqtradeDevMKA$main_NostalgiaForInfinityX.coverage" NAME="main NostalgiaForInfinityX Coverage Results" MODIFIED="1647294949252" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Freqtrade$main_HT.coverage" NAME="main HT Coverage Results" MODIFIED="1642034430286" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Freqtrade$main_SuperScalpMKA.coverage" NAME="main SuperScalpMKA Coverage Results" MODIFIED="1642624377596" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/FreqtradeDevMKA$main_DcaBasedStrategy.coverage" NAME="main DcaBasedStrategy Coverage Results" MODIFIED="1647892621827" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/FreqtradeDevMKA$main_DcaBasedStrategy.coverage" NAME="main DcaBasedStrategy Coverage Results" MODIFIED="1647900336649" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/FreqtradeDevMKA$main_install_ui.coverage" NAME="main install-ui Coverage Results" MODIFIED="1647892611194" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Freqtrade$HourBasedStrategy.coverage" NAME="HourBasedStrategy Coverage Results" MODIFIED="1647109690044" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/user_data/strategies" />
     <SUITE FILE_PATH="coverage/Freqtrade$worker.coverage" NAME="worker Coverage Results" MODIFIED="1635633244848" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/build/lib/freqtrade" />
