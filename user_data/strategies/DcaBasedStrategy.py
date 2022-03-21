@@ -17,21 +17,24 @@ class DcaBasedStrategy(IStrategy):
 
     def __init__(self, config: dict):
         super().__init__(config)
-
         self.stop_buy = IntParameter(0, 1, default=1, space='buy')
+
+        # Optimal timeframe
         self.timeframe = '5m'
-        self.higher_timeframe = '1h'
+
         # Stoploss:
         self.stoploss = -0.10
-        # Optimal timeframe
+
         # Rebuy feature
         self.position_adjustment_enable = True
+
         # Example specific variables
-        self.max_dca_orders = 5
+        self.max_dca_orders = 3
+
         # This number is explained a bit further down
         self.max_dca_multiplier = 5.5
 
-        self.dca_koef = 1
+        self.dca_koef = 0.25
 
         self.use_sell_signal = True
         self.trailing_stop = True
@@ -41,13 +44,11 @@ class DcaBasedStrategy(IStrategy):
 
         # slovnik pro DCA orders
         self.dca_orders = {}
-        # self.blocked = []
         self.btc_candles = []
 
         Thread(target=lambda: self.start_btc_controller()).start()
 
         self.load_dca_orders()
-        # self.load_blocked_pairs()
 
         # pomocny slovnik pro profity men - pouzito pro vypocty casove brzdy
         self.profits = {}
@@ -146,7 +147,7 @@ class DcaBasedStrategy(IStrategy):
                     return None
 
                 # nakup pres DCA jen pokud je ztrata 1%
-                if current_profit > -0.01:
+                if current_profit > -0.005:
                     return None
 
                 # ochrana padajicich svici - pro ucely testu zakomentovat 4 radky
@@ -207,29 +208,6 @@ class DcaBasedStrategy(IStrategy):
         except:
             pass
 
-    # def load_blocked_pairs(self):
-    #     try:
-    #         # nacteni blocked pairs mezi restarty
-    #         if os.path.exists('user_data/blocked_pairs'):
-    #             with open('user_data/blocked_pairs', 'rb') as handle:
-    #                 self.blocked = pickle.load(handle)
-    #                 # vypada to, ze lock drzi v DB
-    #                 # for _pair in self.blocked:
-    #                 #     _block_year = datetime.datetime.now() + timedelta(days=365)
-    #                 #     self.lock_pair(pair=_pair, until=_block_year)
-    #     except:
-    #         # exc_type, exc_obj, exc_tb = sys.exc_info()
-    #         # fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-    #         # print('{} - {} - {}'.format(exc_type, fname, exc_tb.tb_lineno))
-    #         pass
-
-    # def save_blocked_pairs(self):
-    #     try:
-    #         with open('user_data/blocked_pairs', 'wb') as handle:
-    #             pickle.dump(self.blocked, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    #     except:
-    #         pass
-
     def get_koef(self):
         try:
             positive = 0
@@ -241,10 +219,10 @@ class DcaBasedStrategy(IStrategy):
                 else:
                     negative += 1
             k = (negative - positive) / 2
-            # pokud brzda vyjde mensi nez 3 minuty
-            if k < 3:
-                # tak natvrdo 3 minuty nastav
-                k = 3
+            # pokud brzda vyjde mensi nez 5 minuty
+            if k < 5:
+                # tak natvrdo 5 minut nastav
+                k = 5
             return int(round(k))
         except:
             # pri chybe nastav 15 minut
@@ -256,8 +234,6 @@ class DcaBasedStrategy(IStrategy):
         try:
             if sell_reason == 'stop_loss' or 'sell' in sell_reason:
                 if 'force' in sell_reason or sell_reason.startswith('stop_loss'):
-                    # self.blocked.append(pair)
-                    # self.save_blocked_pairs()
                     _block_year = datetime.datetime.now() + timedelta(days=365)
                     self.lock_pair(pair=pair, until=_block_year, reason=sell_reason)
                     pass
@@ -272,7 +248,6 @@ class DcaBasedStrategy(IStrategy):
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
-        # self.get_recommendation(dataframe, metadata['pair'].replace('/', ''))
         dataframe['adx'] = ta.ADX(dataframe, timeperiod=14)
 
         last_candle, previous_candle = self.obtain_last_prev_candles(metadata['pair'])
@@ -283,18 +258,17 @@ class DcaBasedStrategy(IStrategy):
                 if not _found:
                     self.btc_candles.append(last_candle)
 
-        # dataframe['sar'] = ta.SAR(dataframe)
-        # dataframe['tema'] = ta.TEMA(dataframe, timeperiod=9)
+        dataframe['sar'] = ta.SAR(dataframe)
+        dataframe['tema'] = ta.TEMA(dataframe, timeperiod=9)
         dataframe['sma9'] = ta.SMA(dataframe, timeperiod=9)
         dataframe['sma20'] = ta.SMA(dataframe, timeperiod=20)
-        # dataframe['hour'] = dataframe['date'].dt.hour
         dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
         dataframe['ema_fast'] = ta.EMA(dataframe, timeperiod=23)
         dataframe['ema_slow'] = ta.EMA(dataframe, timeperiod=50)
-        # bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-        # dataframe['bollinger_20_upperband'] = bollinger['upper']
-        # dataframe['bollinger_20_lowerband'] = bollinger['lower']
-        # dataframe['ema_fast_slow_pct'] = dataframe['ema_fast'] / dataframe['ema_slow'] * 100
+        bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
+        dataframe['bollinger_20_upperband'] = bollinger['upper']
+        dataframe['bollinger_20_lowerband'] = bollinger['lower']
+        dataframe['ema_fast_slow_pct'] = dataframe['ema_fast'] / dataframe['ema_slow'] * 100
 
         return dataframe
 
@@ -318,7 +292,7 @@ class DcaBasedStrategy(IStrategy):
     def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                    (dataframe['rsi'] >= 120) &
+                    (dataframe['rsi'] >= 85) &
                     (dataframe['volume'].gt(0))
             ),
             'sell'] = 1
@@ -326,16 +300,9 @@ class DcaBasedStrategy(IStrategy):
 
     def start_btc_controller(self):
         while True:
-            try:
-                prices = list(set([s['close'] for s in self.btc_candles]))
-                if len(prices) >= 2:
-                    if prices[-1] > prices[-2]:
-                        self.stop_buy = IntParameter(0, 1, default=0, space='buy')
-                    else:
-                        self.stop_buy = IntParameter(0, 1, default=1, space='buy')
-                else:
-                    self.stop_buy = IntParameter(0, 1, default=1, space='buy')
-            except:
-                self.stop_buy = IntParameter(0, 1, default=1, space='buy')
-                pass
+            self.stop_buy = 1
+            prices = list(set([s['close'] for s in self.btc_candles]))
+            if len(prices) >= 2:
+                if prices[-1] > prices[-2]:
+                    self.stop_buy = 0
             time.sleep(3)

@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6eaaa009-da80-48ae-a916-fd3e9d4d515c" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_data/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/user_data/config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_data/strategies/HourBasedStrategy.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_data/strategies/DcaBasedStrategy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_data/strategies/DcaBasedStrategy.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_data/strategies/DcaBasedStrategy.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,9 +140,9 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Docker.docker-compose.yml.freqtradeStrategyMKACustomSell_05: Compose Deployment" />
-      <item itemvalue="Python.main install-ui" />
       <item itemvalue="Python.main DcaBasedStrategy" />
+      <item itemvalue="Python.main install-ui" />
+      <item itemvalue="Docker.docker-compose.yml.freqtradeStrategyMKACustomSell_05: Compose Deployment" />
     </list>
     <recent_temporary>
       <list>
@@ -308,13 +307,6 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/user_data/strategies/DcaBasedStrategy.py</url>
-          <line>20</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
       <breakpoints-defaults>
         <breakpoint type="python-line" />
       </breakpoints-defaults>
