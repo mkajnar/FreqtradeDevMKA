@@ -13,7 +13,7 @@ import freqtrade.vendor.qtpylib.indicators as qtpylib
 import pickle
 
 
-class HourBasedStrategy(IStrategy):
+class DcaBasedStrategy(IStrategy):
 
     def __init__(self, config: dict):
         super().__init__(config)
