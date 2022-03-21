@@ -1,0 +1,1 @@
+docker-compose run freqtrade hyperopt --hyperopt-loss SharpeHyperOptLossDaily --spaces roi stoploss trailing --strategy StrategyMKACustomSell --config user_data/config_backtest_binance_1m.json -e 100

@@ -1,0 +1,1 @@
+docker run -it -p 22:22 -p 8095:8095 mk/ft
