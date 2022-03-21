@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="6eaaa009-da80-48ae-a916-fd3e9d4d515c" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_data/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/user_data/config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_data/strategies/HourBasedStrategy.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_data/strategies/DcaBasedStrategy.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="JupyterTrust" id="be3d7515-1380-4dba-b8cf-dc337bc4f1a5" />
+  <component name="ProjectId" id="20EsNa4qyEmflnwzWB2ZTWPFpWz" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="true" />
+    <property name="WebServerToolWindowPanel.toolwindow.highlight.mappings" value="true" />
+    <property name="WebServerToolWindowPanel.toolwindow.highlight.symlinks" value="true" />
+    <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
+    <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
+    <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Crypto\Freqtrade\user_data\strategies" />
+      <recent name="C:\Crypto\Freqtrade\freqtrade\user_data\strategies" />
+      <recent name="C:\Crypto\Freqtrade\freqtrade\user_data" />
+      <recent name="C:\Crypto\Freqtrade\freqtrade" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.main DcaBasedStrategy">
+    <configuration name="main DcaBasedStrategy" type="PythonConfigurationType" factoryName="Python">
+      <module name="Freqtrade" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <EXTENSION ID="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" />
+        </ENTRIES>
+      </EXTENSION>
+      <PathMappingSettings>
+        <option name="pathMappings">
+          <list>
+            <mapping local-root="$PROJECT_DIR$" remote-root="/freqtrade" />
+          </list>
+        </option>
+      </PathMappingSettings>
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/freqtrade/main.py" />
+      <option name="PARAMETERS" value="trade -c /freqtrade/user_data/config.json --strategy DcaBasedStrategy" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main install-ui" type="PythonConfigurationType" factoryName="Python">
+      <module name="Freqtrade" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <EXTENSION ID="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" />
+        </ENTRIES>
+      </EXTENSION>
+      <PathMappingSettings>
+        <option name="pathMappings">
+          <list>
+            <mapping local-root="$PROJECT_DIR$" remote-root="/freqtrade" />
+          </list>
+        </option>
+      </PathMappingSettings>
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/freqtrade/main.py" />
+      <option name="PARAMETERS" value="install-ui" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml.freqtradeStrategyMKACustomSell_05: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="freqtradeStrategyMKACustomSell_05" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Docker.docker-compose.yml.freqtradeStrategyMKACustomSell_05: Compose Deployment" />
+      <item itemvalue="Python.main install-ui" />
+      <item itemvalue="Python.main DcaBasedStrategy" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Docker.docker-compose.yml.freqtradeStrategyMKACustomSell_05: Compose Deployment" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6eaaa009-da80-48ae-a916-fd3e9d4d515c" name="Default Changelist" comment="" />
+      <created>1635621042816</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1635621042816</updated>
+      <workItem from="1635621044262" duration="8989000" />
+      <workItem from="1635892884328" duration="1845000" />
+      <workItem from="1635931670695" duration="2339000" />
+      <workItem from="1636279321060" duration="1896000" />
+      <workItem from="1636634042627" duration="3161000" />
+      <workItem from="1636744591130" duration="2449000" />
+      <workItem from="1637166149188" duration="595000" />
+      <workItem from="1637433845416" duration="3280000" />
+      <workItem from="1637509503951" duration="4465000" />
+      <workItem from="1637610782209" duration="1039000" />
+      <workItem from="1638298728998" duration="207000" />
+      <workItem from="1641842176464" duration="10223000" />
+      <workItem from="1641931949583" duration="5944000" />
+      <workItem from="1642012178454" duration="22086000" />
+      <workItem from="1642063100967" duration="3030000" />
+      <workItem from="1642108356374" duration="8737000" />
+      <workItem from="1642150528219" duration="21297000" />
+      <workItem from="1642237867449" duration="22803000" />
+      <workItem from="1642346308016" duration="4120000" />
+      <workItem from="1642437261553" duration="10590000" />
+      <workItem from="1642566675664" duration="12736000" />
+      <workItem from="1642637280497" duration="29000" />
+      <workItem from="1643275304979" duration="36000" />
+      <workItem from="1644443458317" duration="713000" />
+      <workItem from="1644786410144" duration="809000" />
+      <workItem from="1644963849191" duration="10835000" />
+      <workItem from="1645008450885" duration="633000" />
+      <workItem from="1645286542564" duration="4062000" />
+      <workItem from="1645438196948" duration="22141000" />
+      <workItem from="1645517809119" duration="7069000" />
+      <workItem from="1645564437550" duration="31000" />
+      <workItem from="1647108337328" duration="16809000" />
+      <workItem from="1647159309467" duration="15859000" />
+      <workItem from="1647245292859" duration="13276000" />
+      <workItem from="1647289428890" duration="522000" />
+      <workItem from="1647289965095" duration="2711000" />
+      <workItem from="1647294914937" duration="2687000" />
+      <workItem from="1647349431514" duration="56000" />
+      <workItem from="1647891363738" duration="405000" />
+      <workItem from="1647892245372" duration="996000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="192" y="414" width="1089" height="737" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1647892567608">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="192" y="414" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1647892567608" />
+    <state x="931" y="434" width="1089" height="737" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.3072.1688@0.0.3072.1688" timestamp="1647294626638" />
+    <state x="813" y="503" key="#com.intellij.ide.util.MemberChooser" timestamp="1642160738227">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="813" y="503" key="#com.intellij.ide.util.MemberChooser/0.0.3072.1688@0.0.3072.1688" timestamp="1642160738227" />
+    <state x="849" y="180" width="833" height="1049" key="#xdebugger.evaluate" timestamp="1647166252237">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="1587" y="173" width="833" height="1049" key="#xdebugger.evaluate/0.0.2560.1400@0.0.2560.1400" timestamp="1645293409934" />
+    <state x="849" y="180" width="1122" height="1310" key="#xdebugger.evaluate/0.0.3072.1688@0.0.3072.1688" timestamp="1647166252237" />
+    <state width="1929" height="466" key="DebuggerActiveHint" timestamp="1647123474661">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state width="1934" height="387" key="DebuggerActiveHint/0.0.2560.1400@0.0.2560.1400" timestamp="1645450884222" />
+    <state width="1929" height="466" key="DebuggerActiveHint/0.0.3072.1688@0.0.3072.1688" timestamp="1647123474661" />
+    <state x="556" y="623" key="FileChooserDialogImpl" timestamp="1643275325276">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="556" y="623" key="FileChooserDialogImpl/0.0.3072.1688@0.0.3072.1688" timestamp="1643275325276" />
+    <state x="983" y="585" key="Github.ShareDialog" timestamp="1647892324719">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="983" y="585" key="Github.ShareDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1647892324719" />
+    <state x="863" y="391" key="Github.UntrackedFilesDialog" timestamp="1647892358784">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="863" y="391" key="Github.UntrackedFilesDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1647892358784" />
+    <state width="1691" height="658" key="GridCell.Tab.0.bottom" timestamp="1647892621956">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1691" height="658" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1647892621956" />
+    <state width="2045" height="577" key="GridCell.Tab.0.bottom/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008878" />
+    <state width="1691" height="658" key="GridCell.Tab.0.center" timestamp="1647892621956">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1691" height="658" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1647892621956" />
+    <state width="2045" height="577" key="GridCell.Tab.0.center/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008878" />
+    <state width="1691" height="658" key="GridCell.Tab.0.left" timestamp="1647892621956">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1691" height="658" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1647892621956" />
+    <state width="2045" height="577" key="GridCell.Tab.0.left/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008878" />
+    <state width="1691" height="658" key="GridCell.Tab.0.right" timestamp="1647892621956">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1691" height="658" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1647892621956" />
+    <state width="2045" height="577" key="GridCell.Tab.0.right/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008878" />
+    <state width="1691" height="658" key="GridCell.Tab.1.bottom" timestamp="1647892624312">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1691" height="658" key="GridCell.Tab.1.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1647892624312" />
+    <state width="2045" height="577" key="GridCell.Tab.1.bottom/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008755" />
+    <state width="1691" height="658" key="GridCell.Tab.1.center" timestamp="1647892624312">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1691" height="658" key="GridCell.Tab.1.center/0.0.2560.1400@0.0.2560.1400" timestamp="1647892624312" />
+    <state width="2045" height="577" key="GridCell.Tab.1.center/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008755" />
+    <state width="1691" height="658" key="GridCell.Tab.1.left" timestamp="1647892624312">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1691" height="658" key="GridCell.Tab.1.left/0.0.2560.1400@0.0.2560.1400" timestamp="1647892624312" />
+    <state width="2045" height="577" key="GridCell.Tab.1.left/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008755" />
+    <state width="1691" height="658" key="GridCell.Tab.1.right" timestamp="1647892624312">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="1691" height="658" key="GridCell.Tab.1.right/0.0.2560.1400@0.0.2560.1400" timestamp="1647892624312" />
+    <state width="2045" height="577" key="GridCell.Tab.1.right/0.0.3072.1688@0.0.3072.1688" timestamp="1647296008755" />
+    <state x="931" y="458" key="SettingsEditor" timestamp="1647290183195">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="931" y="458" key="SettingsEditor/0.0.3072.1688@0.0.3072.1688" timestamp="1647290183195" />
+    <state width="848" height="700" key="XDebugger.FullValuePopup" timestamp="1644964697384">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state width="848" height="700" key="XDebugger.FullValuePopup/0.0.2560.1400@0.0.2560.1400" timestamp="1644964697384" />
+    <state x="363" y="226" width="2487" height="1298" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1647295996799">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="363" y="226" width="2487" height="1298" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.3072.1688@0.0.3072.1688" timestamp="1647295996799" />
+    <state x="914" y="969" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1647173028682">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="914" y="969" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.3072.1688@0.0.3072.1688" timestamp="1647173028682" />
+    <state x="725" y="577" width="578" height="534" key="find.popup" timestamp="1642533439101">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="725" y="577" width="578" height="534" key="find.popup/0.0.3072.1688@0.0.3072.1688" timestamp="1642533439101" />
+    <state x="663" y="573" width="1138" height="926" key="ftp.server.browser" timestamp="1647289595990">
+      <screen x="0" y="0" width="3072" height="1688" />
+    </state>
+    <state x="663" y="573" width="1138" height="926" key="ftp.server.browser/0.0.3072.1688@0.0.3072.1688" timestamp="1647289595990" />
+    <state x="633" y="359" width="672" height="678" key="search.everywhere.popup" timestamp="1644966076168">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="633" y="359" width="672" height="678" key="search.everywhere.popup/0.0.2560.1400@0.0.2560.1400" timestamp="1644966076168" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/user_data/strategies/DcaBasedStrategy.py</url>
+          <line>20</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+      <breakpoints-defaults>
+        <breakpoint type="python-line" />
+      </breakpoints-defaults>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Freqtrade$main_NostalgiaForInfinityX.coverage" NAME="main NostalgiaForInfinityX Coverage Results" MODIFIED="1645293411021" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Freqtrade$main.coverage" NAME="main Coverage Results" MODIFIED="1642063309643" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/FreqtradeDevMKA$main_NostalgiaForInfinityX.coverage" NAME="main NostalgiaForInfinityX Coverage Results" MODIFIED="1647294949252" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Freqtrade$main_HT.coverage" NAME="main HT Coverage Results" MODIFIED="1642034430286" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Freqtrade$main_SuperScalpMKA.coverage" NAME="main SuperScalpMKA Coverage Results" MODIFIED="1642624377596" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/FreqtradeDevMKA$main_DcaBasedStrategy.coverage" NAME="main DcaBasedStrategy Coverage Results" MODIFIED="1647892621827" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/FreqtradeDevMKA$main_install_ui.coverage" NAME="main install-ui Coverage Results" MODIFIED="1647892611194" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Freqtrade$HourBasedStrategy.coverage" NAME="HourBasedStrategy Coverage Results" MODIFIED="1647109690044" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/user_data/strategies" />
+    <SUITE FILE_PATH="coverage/Freqtrade$worker.coverage" NAME="worker Coverage Results" MODIFIED="1635633244848" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/build/lib/freqtrade" />
+    <SUITE FILE_PATH="coverage/Freqtrade$main_HourBasedStrategy.coverage" NAME="main HourBasedStrategy Coverage Results" MODIFIED="1647283372592" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Freqtrade$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1635632669908" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/freqtrade" />
+    <SUITE FILE_PATH="coverage/Freqtrade$main_DoubleEMACrossoverWithTrend.coverage" NAME="main DoubleEMACrossoverWithTrend Coverage Results" MODIFIED="1644974059704" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Freqtrade$main_Solipsis5.coverage" NAME="main Solipsis5 Coverage Results" MODIFIED="1642109247821" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Freqtrade$SuperScalpMKA.coverage" NAME="SuperScalpMKA Coverage Results" MODIFIED="1642587389572" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/user_data/strategies" />
+    <SUITE FILE_PATH="coverage/FreqtradeDevMKA$main_HourBasedStrategy.coverage" NAME="main HourBasedStrategy Coverage Results" MODIFIED="1647296008734" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Freqtrade$main_CompleteStrategy.coverage" NAME="main CompleteStrategy Coverage Results" MODIFIED="1642353023295" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>
