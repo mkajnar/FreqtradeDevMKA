@@ -35,8 +35,8 @@ class DcaBasedStrategyRsi35(IStrategy):
 
         self.dca_koef = 0.25
 
-        from mka_docker.DcaBaseStrategyRSI_TEST.user_data.strategies.trailing_sl import use_sell_signal, trailing_stop, \
-            trailing_stop_positive, trailing_stop_positive_offset, trailing_only_offset_is_reached
+        from .trailing_sl import use_sell_signal, trailing_stop, trailing_stop_positive, trailing_stop_positive_offset, \
+            trailing_only_offset_is_reached
         self.use_sell_signal = use_sell_signal
         self.trailing_stop = trailing_stop
         self.trailing_stop_positive = trailing_stop_positive
