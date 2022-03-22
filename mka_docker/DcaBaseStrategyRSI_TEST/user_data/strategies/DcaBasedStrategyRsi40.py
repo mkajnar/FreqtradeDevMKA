@@ -35,11 +35,13 @@ class DcaBasedStrategyRsi40(IStrategy):
 
         self.dca_koef = 0.25
 
-        self.use_sell_signal = True
-        self.trailing_stop = True
-        self.trailing_stop_positive = 0.003
-        self.trailing_stop_positive_offset = 0.005
-        self.trailing_only_offset_is_reached = True
+        from mka_docker.DcaBaseStrategyRSI_TEST.user_data.strategies.trailing_sl import use_sell_signal, trailing_stop, \
+            trailing_stop_positive, trailing_stop_positive_offset, trailing_only_offset_is_reached
+        self.use_sell_signal = use_sell_signal
+        self.trailing_stop = trailing_stop
+        self.trailing_stop_positive = trailing_stop_positive
+        self.trailing_stop_positive_offset = trailing_stop_positive_offset
+        self.trailing_only_offset_is_reached = trailing_only_offset_is_reached
 
         # slovnik pro DCA orders
         self.dca_orders = {}
