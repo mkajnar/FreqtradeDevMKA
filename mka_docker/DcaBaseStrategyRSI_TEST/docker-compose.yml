@@ -4,7 +4,7 @@ services:
   freqtradeRsi20:
     image: mka/ft
     restart: unless-stopped
-    container_name: DcaBasedStrategyTestRsi30
+    container_name: DcaBasedStrategyTestRsi20
     volumes:
       - "./user_data:/freqtrade/user_data"
       - "/etc/timezone:/etc/timezone:ro"
