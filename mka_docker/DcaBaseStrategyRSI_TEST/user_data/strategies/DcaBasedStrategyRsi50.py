@@ -12,7 +12,8 @@ import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import pickle
 
-
+from user_data.strategies.tsl_settings import use_sell_signal, trailing_stop_positive, trailing_stop_positive_offset, \
+    trailing_stop, trailing_only_offset_is_reached
 
 
 class DcaBasedStrategyRsi50(IStrategy):
@@ -21,11 +22,13 @@ class DcaBasedStrategyRsi50(IStrategy):
         super().__init__(config)
 
         self.rsi = 50
-        self.use_sell_signal = True
-        self.trailing_stop = True
-        self.trailing_stop_positive = 0.010
-        self.trailing_stop_positive_offset = 0.015
-        self.trailing_only_offset_is_reached = True
+
+        self.use_sell_signal = use_sell_signal
+        self.trailing_stop = trailing_stop
+        self.trailing_stop_positive = trailing_stop_positive
+        self.trailing_stop_positive_offset = trailing_stop_positive_offset
+        self.trailing_only_offset_is_reached = trailing_only_offset_is_reached
+
         self.stop_buy = IntParameter(0, 1, default=1, space='buy')
         self.timeframe = '5m'
         self.higher_timeframe = '1h'
@@ -155,11 +158,12 @@ class DcaBasedStrategyRsi50(IStrategy):
                 # ochrana na ADX last and prev candle
                 # ochrana na ADX mensi nez 25
 
-                #if current_profit < 0:
+                # if current_profit < 0:
                 #    return None
 
                 if last_candle['close'] <= previous_candle['close'] \
-                        or ((last_candle['adx'] <= previous_candle['adx']) and last_candle['adx'] < 25) and last_candle['volume']==0:
+                        or ((last_candle['adx'] <= previous_candle['adx']) and last_candle['adx'] < 25) and last_candle[
+                    'volume'] == 0:
                     return None
 
                 if 0 < count_of_buys <= self.max_dca_orders:
@@ -336,7 +340,7 @@ class DcaBasedStrategyRsi50(IStrategy):
             try:
                 prices = list(set([s['close'] for s in self.btc_candles]))
                 if len(prices) >= 3:
-                    if prices[-1]  > prices[-2] > prices[-3]:
+                    if prices[-1] > prices[-2] > prices[-3]:
                         self.stop_buy = IntParameter(0, 1, default=0, space='buy')
                     else:
                         self.stop_buy = IntParameter(0, 1, default=1, space='buy')
