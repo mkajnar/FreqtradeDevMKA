@@ -11,14 +11,18 @@ from pandas import DataFrame
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import pickle
-from .DcaBasedStrategyBase import DcaBasedStrategyBase
 
-class DcaBasedStrategyRsi20(DcaBasedStrategyBase):
+class DcaBasedStrategyRsi20(IStrategy):
 
     def __init__(self, config: dict):
         super().__init__(config)
 
         self.rsi = 20
+        self.use_sell_signal = True
+        self.trailing_stop = True
+        self.trailing_stop_positive = 0.010
+        self.trailing_stop_positive_offset = 0.015
+        self.trailing_only_offset_is_reached = True
 
         self.stop_buy = IntParameter(0, 1, default=1, space='buy')
         self.timeframe = '5m'
