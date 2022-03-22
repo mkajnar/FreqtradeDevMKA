@@ -11,9 +11,9 @@ from pandas import DataFrame
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import pickle
+from .DcaBasedStrategyBase import DcaBasedStrategyBase
 
-
-class DcaBasedStrategyRsi20(IStrategy):
+class DcaBasedStrategyRsi20(DcaBasedStrategyBase):
 
     def __init__(self, config: dict):
         super().__init__(config)
@@ -34,14 +34,6 @@ class DcaBasedStrategyRsi20(IStrategy):
         self.max_dca_multiplier = 5.5
 
         self.dca_koef = 0.25
-
-        from .trailing_sl import use_sell_signal, trailing_stop, trailing_stop_positive, trailing_stop_positive_offset, \
-            trailing_only_offset_is_reached
-        self.use_sell_signal = use_sell_signal
-        self.trailing_stop = trailing_stop
-        self.trailing_stop_positive = trailing_stop_positive
-        self.trailing_stop_positive_offset = trailing_stop_positive_offset
-        self.trailing_only_offset_is_reached = trailing_only_offset_is_reached
 
         # slovnik pro DCA orders
         self.dca_orders = {}

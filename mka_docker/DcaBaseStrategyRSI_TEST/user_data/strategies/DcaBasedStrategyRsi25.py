@@ -12,9 +12,10 @@ import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import pickle
 
+from .DcaBasedStrategyBase import DcaBasedStrategyBase
 
 
-class DcaBasedStrategyRsi25(IStrategy):
+class DcaBasedStrategyRsi25(DcaBasedStrategyBase):
 
     def __init__(self, config: dict):
         super().__init__(config)
