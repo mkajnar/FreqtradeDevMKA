@@ -1,7 +1,7 @@
 ---
 version: '3'
 services:
-  freqtradeRsi30:
+  freqtradeRsi20:
     image: mka/ft
     restart: unless-stopped
     container_name: DcaBasedStrategyTestRsi30
@@ -13,10 +13,61 @@ services:
       - "0.0.0.0:8081:8080"
     command: >
       trade
+      --logfile /freqtrade/user_data/logs/freqtrade_rsi20.log
+      --db-url sqlite:////freqtrade/user_data/tradesv3_20.sqlite
+      --config /freqtrade/user_data/configs/config.json
+      --strategy DcaBasedStrategyRsi20
+
+  freqtradeRsi25:
+    image: mka/ft
+    restart: unless-stopped
+    container_name: DcaBasedStrategyTestRsi25
+    volumes:
+      - "./user_data:/freqtrade/user_data"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    ports:
+      - "0.0.0.0:8082:8080"
+    command: >
+      trade
+      --logfile /freqtrade/user_data/logs/freqtrade_rsi25.log
+      --db-url sqlite:////freqtrade/user_data/tradesv3_25.sqlite
+      --config /freqtrade/user_data/configs/config.json
+      --strategy DcaBasedStrategyRsi25
+
+  freqtradeRsi30:
+    image: mka/ft
+    restart: unless-stopped
+    container_name: DcaBasedStrategyTestRsi30
+    volumes:
+      - "./user_data:/freqtrade/user_data"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    ports:
+      - "0.0.0.0:8083:8080"
+    command: >
+      trade
       --logfile /freqtrade/user_data/logs/freqtrade_rsi30.log
       --db-url sqlite:////freqtrade/user_data/tradesv3_30.sqlite
       --config /freqtrade/user_data/configs/config.json
       --strategy DcaBasedStrategyRsi30
+
+  freqtradeRsi35:
+    image: mka/ft
+    restart: unless-stopped
+    container_name: DcaBasedStrategyTestRsi35
+    volumes:
+      - "./user_data:/freqtrade/user_data"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    ports:
+      - "0.0.0.0:8084:8080"
+    command: >
+      trade
+      --logfile /freqtrade/user_data/logs/freqtrade_rsi35.log
+      --db-url sqlite:////freqtrade/user_data/tradesv3_35.sqlite
+      --config /freqtrade/user_data/configs/config.json
+      --strategy DcaBasedStrategyRsi35
 
   freqtradeRsi40:
     image: mka/ft
@@ -27,13 +78,30 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
     ports:
-      - "0.0.0.0:8082:8080"
+      - "0.0.0.0:8085:8080"
     command: >
       trade
       --logfile /freqtrade/user_data/logs/freqtrade_rsi40.log
       --db-url sqlite:////freqtrade/user_data/tradesv3_40.sqlite
       --config /freqtrade/user_data/configs/config.json
       --strategy DcaBasedStrategyRsi40
+
+  freqtradeRsi45:
+    image: mka/ft
+    restart: unless-stopped
+    container_name: DcaBasedStrategyTestRsi45
+    volumes:
+      - "./user_data:/freqtrade/user_data"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    ports:
+      - "0.0.0.0:8086:8080"
+    command: >
+      trade
+      --logfile /freqtrade/user_data/logs/freqtrade_rsi45.log
+      --db-url sqlite:////freqtrade/user_data/tradesv3_45.sqlite
+      --config /freqtrade/user_data/configs/config.json
+      --strategy DcaBasedStrategyRsi45
 
   freqtradeRsi50:
     image: mka/ft
@@ -44,7 +112,7 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
     ports:
-      - "0.0.0.0:8083:8080"
+      - "0.0.0.0:8087:8080"
     command: >
       trade
       --logfile /freqtrade/user_data/logs/freqtrade_rsi50.log

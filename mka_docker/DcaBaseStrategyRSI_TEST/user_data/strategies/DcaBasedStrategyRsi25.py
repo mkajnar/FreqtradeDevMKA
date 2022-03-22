@@ -13,12 +13,12 @@ import freqtrade.vendor.qtpylib.indicators as qtpylib
 import pickle
 
 
-class DcaBasedStrategyRsi40(IStrategy):
+class DcaBasedStrategyRsi25(IStrategy):
 
     def __init__(self, config: dict):
         super().__init__(config)
 
-        self.rsi = 40
+        self.rsi = 25
 
         self.stop_buy = IntParameter(0, 1, default=1, space='buy')
         self.timeframe = '5m'

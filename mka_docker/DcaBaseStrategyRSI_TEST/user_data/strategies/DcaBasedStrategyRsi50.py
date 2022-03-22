@@ -18,6 +18,8 @@ class DcaBasedStrategyRsi50(IStrategy):
     def __init__(self, config: dict):
         super().__init__(config)
 
+        self.rsi = 50
+
         self.stop_buy = IntParameter(0, 1, default=1, space='buy')
         self.timeframe = '5m'
         self.higher_timeframe = '1h'
@@ -198,15 +200,15 @@ class DcaBasedStrategyRsi50(IStrategy):
     def load_dca_orders(self):
         try:
             # nacteni DCA orders mezi restarty
-            if os.path.exists('user_data/dca_orders_50'):
-                with open('user_data/dca_orders_50', 'rb') as handle:
+            if os.path.exists(f'user_data/dca_orders_{self.rsi}'):
+                with open(f'user_data/dca_orders_{self.rsi}', 'rb') as handle:
                     self.dca_orders = pickle.load(handle)
         except:
             pass
 
     def save_dca_orders(self):
         try:
-            with open('user_data/dca_orders_50', 'wb') as handle:
+            with open(f'user_data/dca_orders_{self.rsi}', 'wb') as handle:
                 pickle.dump(self.dca_orders, handle, protocol=pickle.HIGHEST_PROTOCOL)
         except:
             pass
@@ -308,14 +310,14 @@ class DcaBasedStrategyRsi50(IStrategy):
             dataframe.loc[
                 (
                         (dataframe['volume'].gt(0)) &
-                        (dataframe['rsi'].gt(50))
+                        (dataframe['rsi'].gt(self.rsi))
                 ),
                 'buy'] = 0
         else:
             dataframe.loc[
                 (
                         (dataframe['volume'].gt(0)) &
-                        (dataframe['rsi'].gt(50))
+                        (dataframe['rsi'].gt(self.rsi))
                 ),
                 'buy'] = 1
         return dataframe
