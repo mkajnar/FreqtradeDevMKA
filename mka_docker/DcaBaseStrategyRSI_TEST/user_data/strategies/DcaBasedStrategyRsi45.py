@@ -152,8 +152,8 @@ class DcaBasedStrategyRsi45(IStrategy):
                     self.save_dca_orders()
                     return None
 
-                # nakup pres DCA jen pokud je ztrata 1%
-                if current_profit > -0.005:
+                # nakup pres DCA jen pokud je ztrata 3%
+                if current_profit > -0.03:
                     return None
 
                 # ochrana padajicich svici - pro ucely testu zakomentovat 4 radky
