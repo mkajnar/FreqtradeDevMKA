@@ -32,14 +32,14 @@ class DcaBasedStrategyRsi35(IStrategy):
         self.trailing_only_offset_is_reached = trailing_only_offset_is_reached
 
         self.stop_buy = IntParameter(0, 1, default=1, space='buy')
-        self.timeframe = '5m'
+        self.timeframe = '1m'
         self.higher_timeframe = '1h'
 
         # Optimal timeframe
         # Rebuy feature
         self.position_adjustment_enable = True
         # Example specific variables
-        self.max_dca_orders = 20
+        self.max_dca_orders = 3
         # This number is explained a bit further down
         self.max_dca_multiplier = 5.5
 
