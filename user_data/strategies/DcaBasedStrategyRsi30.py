@@ -13,7 +13,7 @@ import freqtrade.vendor.qtpylib.indicators as qtpylib
 import pickle
 
 from user_data.strategies.tsl_settings import trailing_only_offset_is_reached, use_sell_signal, trailing_stop, \
-    trailing_stop_positive, trailing_stop_positive_offset
+    trailing_stop_positive, trailing_stop_positive_offset, stoploss
 
 
 class DcaBasedStrategyRsi30(IStrategy):
@@ -23,6 +23,7 @@ class DcaBasedStrategyRsi30(IStrategy):
 
         self.rsi = 30
 
+        self.stoploss = stoploss
         self.use_sell_signal = use_sell_signal
         self.trailing_stop = trailing_stop
         self.trailing_stop_positive = trailing_stop_positive
@@ -32,8 +33,7 @@ class DcaBasedStrategyRsi30(IStrategy):
         self.stop_buy = IntParameter(0, 1, default=1, space='buy')
         self.timeframe = '5m'
         self.higher_timeframe = '1h'
-        # Stoploss:
-        self.stoploss = -0.10
+
         # Optimal timeframe
         # Rebuy feature
         self.position_adjustment_enable = True

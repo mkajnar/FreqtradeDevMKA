@@ -13,7 +13,7 @@ import freqtrade.vendor.qtpylib.indicators as qtpylib
 import pickle
 
 from user_data.strategies.tsl_settings import use_sell_signal, trailing_stop_positive, trailing_stop_positive_offset, \
-    trailing_stop, trailing_only_offset_is_reached
+    trailing_stop, trailing_only_offset_is_reached, stoploss
 
 
 class DcaBasedStrategyRsi50(IStrategy):
@@ -23,6 +23,7 @@ class DcaBasedStrategyRsi50(IStrategy):
 
         self.rsi = 50
 
+        self.stoploss = stoploss
         self.use_sell_signal = use_sell_signal
         self.trailing_stop = trailing_stop
         self.trailing_stop_positive = trailing_stop_positive
