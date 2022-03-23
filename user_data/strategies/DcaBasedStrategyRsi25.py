@@ -12,6 +12,7 @@ import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import pickle
 
+from user_data.strategies.roi_settings import get_rois
 from user_data.strategies.tsl_settings import use_sell_signal, trailing_stop, trailing_stop_positive, \
     trailing_stop_positive_offset, trailing_only_offset_is_reached, stoploss
 
@@ -61,13 +62,7 @@ class DcaBasedStrategyRsi25(IStrategy):
         self.profits = {}
 
         # ROI table:
-        self.minimal_roi = {
-            "0": 0.10,
-            "15": 0.07,
-            "60": 0.05,
-            "120": 0.03,
-            "180": 0.01
-        }
+        self.minimal_roi = get_rois()
 
         self.unfilledtimeout = {
             'buy': 60 * 5,
