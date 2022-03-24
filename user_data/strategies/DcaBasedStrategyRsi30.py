@@ -12,6 +12,7 @@ import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import pickle
 
+from user_data.strategies.dca_setting import dca_percent
 from user_data.strategies.roi_settings import get_rois
 from user_data.strategies.tsl_settings import trailing_only_offset_is_reached, use_sell_signal, trailing_stop, \
     trailing_stop_positive, trailing_stop_positive_offset, stoploss
@@ -149,7 +150,7 @@ class DcaBasedStrategyRsi30(IStrategy):
                     return None
 
                 # nakup pres DCA jen pokud je ztrata 3%
-                if current_profit > -0.03:
+                if current_profit > dca_percent:
                     return None
 
                 # ochrana padajicich svici - pro ucely testu zakomentovat 4 radky
