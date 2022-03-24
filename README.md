@@ -1,3 +1,15 @@
+Welcome to my page dedicated to DCA Strategy in FreqTrade environment. 
+
+I can fully debug the Freqtrade environment and strategies in PyCharm. 
+
+If any of you need help with this, just email me at mkajnar@mikesoft.cz.
+
+I share all the resources for full debugging in PyCharm here, but some
+steps are better to show in person, for example using remote access.
+
+It's a fairly complex process, which I hope to write up as a tutorial later.
+
+
 # ![freqtrade](https://raw.githubusercontent.com/freqtrade/freqtrade/develop/docs/assets/freqtrade_poweredby.svg)
 
 [![Freqtrade CI](https://github.com/freqtrade/freqtrade/workflows/Freqtrade%20CI/badge.svg)](https://github.com/freqtrade/freqtrade/actions/)
