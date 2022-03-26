@@ -25,7 +25,9 @@ class DcaBasedStrategy(IStrategy):
         self.rsi = 30
         self.timeframe = '5m'
         self.higher_timeframe = '1h'
+        #jen debug
         self.dca_wait_secs = 60
+        # self.dca_wait_secs = 300
         self.minimal_roi = get_rois()
 
         self.stoploss = stoploss
@@ -124,6 +126,8 @@ class DcaBasedStrategy(IStrategy):
                     self.save_dca_orders()
                     return None
 
+                if last_candle['rsi'] > self.rsi:
+                    return None
                 # nakup pres DCA jen pokud je ztrata 3%
                 if current_profit > dca_percent:
                     return None
@@ -161,7 +165,7 @@ class DcaBasedStrategy(IStrategy):
 
     def confirm_buy_higher_frame(self, pair):
         try:
-            dataframe = self.dp.get_pair_dataframe(pair=pair,timeframe=self.higher_timeframe)
+            dataframe = self.dp.get_pair_dataframe(pair=pair, timeframe=self.higher_timeframe)
             last_candle = dataframe.iloc[-1].squeeze()
             previous_candle = dataframe.iloc[-2].squeeze()
             return previous_candle['close'] < last_candle['close']
@@ -262,14 +266,14 @@ class DcaBasedStrategy(IStrategy):
             dataframe.loc[
                 (
                         (dataframe['volume'].gt(0)) &
-                        (dataframe['rsi'].gt(self.rsi))
+                        (qtpylib.crossed_above(dataframe['rsi'],self.rsi))
                 ),
                 'buy'] = 1
         else:
             dataframe.loc[
                 (
                         (dataframe['volume'].gt(0)) &
-                        (dataframe['rsi'].gt(self.rsi))
+                        (qtpylib.crossed_above(dataframe['rsi'],self.rsi))
                 ),
                 'buy'] = 0
         return dataframe
