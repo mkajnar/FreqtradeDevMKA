@@ -128,7 +128,7 @@ class DcaBasedStrategy(IStrategy):
 
                 if last_candle['rsi'] > self.rsi:
                     return None
-                # nakup pres DCA jen pokud je ztrata 3%
+                # nakup pres DCA jen pokud je ztrata vetsi nez definovana
                 if current_profit > dca_percent:
                     return None
 
