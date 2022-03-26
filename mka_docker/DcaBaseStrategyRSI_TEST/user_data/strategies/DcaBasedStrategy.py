@@ -25,7 +25,7 @@ class DcaBasedStrategy(IStrategy):
         self.rsi = 30
         self.timeframe = '5m'
         self.higher_timeframe = '1h'
-        self.dca_wait_secs = 60
+        self.dca_wait_secs = 300
         self.minimal_roi = get_rois()
 
         self.stoploss = stoploss
