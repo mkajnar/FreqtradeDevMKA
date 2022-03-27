@@ -25,10 +25,10 @@ class DcaBasedStrategy(IStrategy):
         self.buy_rsi = 50
         self.dca_rsi = 35
         self.timeframe = '1m'
-        self.higher_timeframe = '30m'
+        self.higher_timeframe = '1h'
         #jen debug
-        self.dca_wait_secs = 15
-        #self.dca_wait_secs = 300
+        #self.dca_wait_secs = 15
+        self.dca_wait_secs = 300
         self.minimal_roi = get_rois()
 
         self.stoploss = stoploss
@@ -274,8 +274,8 @@ class DcaBasedStrategy(IStrategy):
         else:
             dataframe.loc[
                 (
-                        (dataframe['volume'].gt(0)) &
-                        (qtpylib.crossed_above(dataframe['rsi'],self.buy_rsi))
+                        (dataframe['volume'].gt(0))
+                        #& (qtpylib.crossed_above(dataframe['rsi'],self.buy_rsi))
                 ),
                 'buy'] = 0
         return dataframe
