@@ -22,13 +22,13 @@ class DcaBasedStrategy(IStrategy):
 
     def __init__(self, config: dict):
         super().__init__(config)
-        self.buy_rsi = 55
-        self.dca_rsi = 40
-        self.timeframe = '1m'
-        self.higher_timeframe = '1h'
+        self.buy_rsi = 50
+        self.dca_rsi = 30
+        self.timeframe = '15m'
+        self.higher_timeframe = '2h'
         #jen debug
-        #self.dca_wait_secs = 60
-        self.dca_wait_secs = 300
+        self.dca_wait_secs = 60
+        #self.dca_wait_secs = 300
         self.minimal_roi = get_rois()
 
         self.stoploss = stoploss
@@ -39,9 +39,9 @@ class DcaBasedStrategy(IStrategy):
         self.trailing_only_offset_is_reached = trailing_only_offset_is_reached
         self.stop_buy = IntParameter(0, 1, default=1, space='buy')
         self.position_adjustment_enable = True
-        self.max_dca_orders = 15
+        self.max_dca_orders = 5
         self.max_dca_multiplier = 5.5
-        self.dca_koef = 1.5
+        self.dca_koef = 2
         self.dca_orders = {}
         self.profits = {}
         self.btc_candles = []
@@ -191,8 +191,8 @@ class DcaBasedStrategy(IStrategy):
 
     def load_dca_orders(self):
         try:
-            if os.path.exists(f'user_data/dca_orders_{self.rsi}'):
-                with open(f'user_data/dca_orders_{self.rsi}', 'rb') as handle:
+            if os.path.exists(f'user_data/dca_orders_{self.buy_rsi}'):
+                with open(f'user_data/dca_orders_{self.buy_rsi}', 'rb') as handle:
                     self.dca_orders = pickle.load(handle)
         except:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -202,14 +202,14 @@ class DcaBasedStrategy(IStrategy):
 
     def save_dca_orders(self):
         try:
-            with open(f'user_data/dca_orders_{self.rsi}_history', 'a') as f:
+            with open(f'user_data/dca_orders_{self.buy_rsi}_history', 'a') as f:
                 for k in self.dca_orders.keys():
                     if not self.dca_orders[k][2]:
                         f.write(f'{self.dca_orders[k][1]}: {k} - Stake: {self.dca_orders[k][0]}\n')
                         self.dca_orders[k][2] = True
                 f.close()
 
-            with open(f'user_data/dca_orders_{self.rsi}', 'wb') as handle:
+            with open(f'user_data/dca_orders_{self.buy_rsi}', 'wb') as handle:
                 pickle.dump(self.dca_orders, handle, protocol=pickle.HIGHEST_PROTOCOL)
         except:
             exc_type, exc_obj, exc_tb = sys.exc_info()
