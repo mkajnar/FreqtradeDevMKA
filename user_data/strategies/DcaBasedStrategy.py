@@ -23,11 +23,11 @@ class DcaBasedStrategy(IStrategy):
     def __init__(self, config: dict):
         super().__init__(config)
         self.buy_rsi = 50
-        self.dca_rsi = 30
-        self.timeframe = '15m'
-        self.higher_timeframe = '2h'
+        self.dca_rsi = 35
+        self.timeframe = '1m'
+        self.higher_timeframe = '30m'
         #jen debug
-        self.dca_wait_secs = 60
+        self.dca_wait_secs = 15
         #self.dca_wait_secs = 300
         self.minimal_roi = get_rois()
 
@@ -41,7 +41,7 @@ class DcaBasedStrategy(IStrategy):
         self.position_adjustment_enable = True
         self.max_dca_orders = 5
         self.max_dca_multiplier = 5.5
-        self.dca_koef = 2
+        self.dca_koef = 0.5
         self.dca_orders = {}
         self.profits = {}
         self.btc_candles = []
@@ -127,16 +127,16 @@ class DcaBasedStrategy(IStrategy):
                     self.save_dca_orders()
                     return None
 
-                if last_candle['rsi'] > self.dca_rsi:
-                    return None
-
                 if current_profit > dca_percent:
                     return None
 
-                if last_candle['close'] <= previous_candle['close'] \
-                        or ((last_candle['adx'] <= previous_candle['adx'])
-                            and last_candle['adx'] < 25) and last_candle['volume'] == 0:
+                if last_candle['rsi'] > self.dca_rsi:
                     return None
+
+                # if last_candle['close'] <= previous_candle['close'] \
+                #         or ((last_candle['adx'] <= previous_candle['adx'])
+                #             and last_candle['adx'] < 25) and last_candle['volume'] == 0:
+                #     return None
 
                 if 0 < count_of_buys <= self.max_dca_orders:
                     try:
@@ -266,8 +266,9 @@ class DcaBasedStrategy(IStrategy):
         if self.confirm_buy_higher_frame(metadata['pair']):
             dataframe.loc[
                 (
-                        (dataframe['volume'].gt(0)) &
-                        (qtpylib.crossed_above(dataframe['rsi'],self.buy_rsi))
+                        (dataframe['volume'].gt(0))
+                        # &
+                        # (qtpylib.crossed_above(dataframe['rsi'],self.buy_rsi))
                 ),
                 'buy'] = 1
         else:
@@ -282,7 +283,7 @@ class DcaBasedStrategy(IStrategy):
     def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                    (dataframe['rsi'] >= 85) &
+                    (dataframe['rsi'] >= 100) &
                     (dataframe['volume'].gt(0))
             ),
             'sell'] = 1
