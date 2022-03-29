@@ -23,12 +23,12 @@ class DcaBasedStrategy(IStrategy):
     def __init__(self, config: dict):
         super().__init__(config)
         self.buy_rsi = 50
-        self.dca_rsi = 35
+        self.dca_rsi = 30
         self.timeframe = '1m'
         self.higher_timeframe = '1h'
         #jen debug
-        #self.dca_wait_secs = 15
-        self.dca_wait_secs = 300
+        self.dca_wait_secs = 600
+        #self.dca_wait_secs = 300
         self.minimal_roi = get_rois()
 
         self.stoploss = stoploss
@@ -40,7 +40,7 @@ class DcaBasedStrategy(IStrategy):
         self.stop_buy = IntParameter(0, 1, default=1, space='buy')
         self.position_adjustment_enable = True
         self.max_dca_orders = 5
-        self.max_dca_multiplier = 5.5
+        self.max_dca_multiplier = 5
         self.dca_koef = 0.5
         self.dca_orders = {}
         self.profits = {}
@@ -275,7 +275,8 @@ class DcaBasedStrategy(IStrategy):
             dataframe.loc[
                 (
                         (dataframe['volume'].gt(0))
-                        #& (qtpylib.crossed_above(dataframe['rsi'],self.buy_rsi))
+                        # &
+                        # (qtpylib.crossed_above(dataframe['rsi'],self.buy_rsi))
                 ),
                 'buy'] = 0
         return dataframe
