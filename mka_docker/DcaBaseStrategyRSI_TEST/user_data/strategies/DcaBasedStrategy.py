@@ -29,6 +29,9 @@ class DcaBasedStrategy(IStrategy):
         #jen debug
         self.dca_wait_secs = 600
         #self.dca_wait_secs = 300
+        #self.minimal_roi = {
+        #                       "0": 0.0055
+        #                   }
         self.minimal_roi = get_rois()
 
         self.stoploss = stoploss
@@ -39,9 +42,9 @@ class DcaBasedStrategy(IStrategy):
         self.trailing_only_offset_is_reached = trailing_only_offset_is_reached
         self.stop_buy = IntParameter(0, 1, default=1, space='buy')
         self.position_adjustment_enable = True
-        self.max_dca_orders = 5
-        self.max_dca_multiplier = 5
-        self.dca_koef = 0.5
+        self.max_dca_orders = 10
+        self.max_dca_multiplier = 5.5
+        self.dca_koef = 0.25
         self.dca_orders = {}
         self.profits = {}
         self.btc_candles = []
