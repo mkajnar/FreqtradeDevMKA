@@ -42,8 +42,8 @@ class DcaBasedStrategy(IStrategy):
         self.trailing_only_offset_is_reached = trailing_only_offset_is_reached
         self.stop_buy = IntParameter(0, 1, default=1, space='buy')
         self.position_adjustment_enable = True
-        self.max_dca_orders = 10
-        self.max_dca_multiplier = 5.5
+        self.max_dca_orders = 5
+        self.max_dca_multiplier = 9.75
         self.dca_koef = 0.25
         self.dca_orders = {}
         self.profits = {}
@@ -110,6 +110,15 @@ class DcaBasedStrategy(IStrategy):
         :param **kwargs: Ensure to keep this here so updates to this won't break your strategy.
         :return float: Stake amount to adjust your trade
         """
+
+        # Allow up to 3 additional increasingly larger buys (4 in total)
+        # Initial buy is 1x
+        # If that falls to -5% profit, we buy 1.25x more, average profit should increase to roughly -2.2%
+        # If that falls down to -5% again, we buy 1.5x more
+        # If that falls once again down to -5%, we buy 1.75x more
+        # Total stake for this trade would be 1 + 1.25 + 1.5 + 1.75 = 5.5x of the initial allowed stake.
+        # That is why max_dca_multiplier is 5.5
+        # Hope you have a deep wallet!
 
         try:
             # plneni slovniku profitu prubeznymi profity
