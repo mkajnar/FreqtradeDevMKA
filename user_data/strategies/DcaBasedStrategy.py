@@ -11,6 +11,7 @@ from pandas import DataFrame
 import talib.abstract as ta
 import freqtrade.vendor.qtpylib.indicators as qtpylib
 import pickle
+import json
 
 from user_data.strategies.dca_setting import dca_percent
 from user_data.strategies.roi_settings import get_rois
@@ -22,15 +23,19 @@ class DcaBasedStrategy(IStrategy):
 
     def __init__(self, config: dict):
         super().__init__(config)
-        self.buy_rsi = 50
-        self.dca_rsi = 30
+        self.dca_rsi = 35
+        self.buy_rsi_min = 20
+        self.buy_rsi_max = 50
         self.timeframe = '1m'
-        self.higher_timeframe = '1h'
-        #jen debug
-        self.dca_wait_secs = 600
-        #self.dca_wait_secs = 300
-        #self.minimal_roi = {
-        #                       "0": 0.0055
+
+        self.informative_timeframes = ['3m', '5m']
+
+        self.higher_timeframe = '5m'
+        # jen debug
+        self.dca_wait_secs = 60
+        # self.dca_wait_secs = 300
+        # self.minimal_roi = {
+        #                       "0": 0.003
         #                   }
         self.minimal_roi = get_rois()
 
@@ -145,10 +150,8 @@ class DcaBasedStrategy(IStrategy):
                 if last_candle['rsi'] > self.dca_rsi:
                     return None
 
-                # if last_candle['close'] <= previous_candle['close'] \
-                #         or ((last_candle['adx'] <= previous_candle['adx'])
-                #             and last_candle['adx'] < 25) and last_candle['volume'] == 0:
-                #     return None
+                if last_candle['close'] < previous_candle['close']:
+                    return None
 
                 if 0 < count_of_buys <= self.max_dca_orders:
                     try:
@@ -176,18 +179,40 @@ class DcaBasedStrategy(IStrategy):
 
         return None
 
-    def confirm_buy_higher_frame(self, pair):
-        try:
-            dataframe = self.dp.get_pair_dataframe(pair=pair, timeframe=self.higher_timeframe)
-            last_candle = dataframe.iloc[-1].squeeze()
-            previous_candle = dataframe.iloc[-2].squeeze()
-            return previous_candle['close'] < last_candle['close']
-        except:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print('{} - {} - {}'.format(exc_type, fname, exc_tb.tb_lineno))
-            pass
-        return False
+    # def confirm_buy_higher_frame(self, pair, dataframe):
+    #     try:
+    #         higher_dataframe = self.dp.get_pair_dataframe(pair=pair, timeframe=self.higher_timeframe)
+    #         nums = [-1, -2]
+    #         hist_candles_actual = {}
+    #         hist_candles_higher = {}
+    #
+    #         for i in nums:
+    #             try:
+    #                 hist_candles_actual[i] = dataframe.iloc[i].squeeze()
+    #                 hist_candles_higher[i] = higher_dataframe.iloc[i].squeeze()
+    #             except:
+    #                 exc_type, exc_obj, exc_tb = sys.exc_info()
+    #                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    #                 print('{} - {} - {}'.format(exc_type, fname, exc_tb.tb_lineno))
+    #
+    #         # open(f'user_data/logs/Candles_{pair.split("/")[0]}_{datetime.datetime.now()}.json', mode='a').write(
+    #         #     json.dumps(hist_candles))
+    #
+    #         try:
+    #             r = hist_candles_actual[-1]['sma9'] > hist_candles_actual[-2]['sma9'] and hist_candles_actual[-1][
+    #                 'sma9'] > hist_candles_actual[-1]['sma20'] > hist_candles_actual[-2]['sma20']
+    #             return r
+    #         except:
+    #             pass
+    #
+    #         return False
+    #
+    #     except:
+    #         exc_type, exc_obj, exc_tb = sys.exc_info()
+    #         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    #         print('{} - {} - {}'.format(exc_type, fname, exc_tb.tb_lineno))
+    #         pass
+    #     return False
 
     def obtain_last_prev_candles(self, pair, timeframe):
         try:
@@ -203,8 +228,8 @@ class DcaBasedStrategy(IStrategy):
 
     def load_dca_orders(self):
         try:
-            if os.path.exists(f'user_data/dca_orders_{self.buy_rsi}'):
-                with open(f'user_data/dca_orders_{self.buy_rsi}', 'rb') as handle:
+            if os.path.exists(f'user_data/dca_orders_{self.dca_rsi}'):
+                with open(f'user_data/dca_orders_{self.dca_rsi}', 'rb') as handle:
                     self.dca_orders = pickle.load(handle)
         except:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -214,14 +239,14 @@ class DcaBasedStrategy(IStrategy):
 
     def save_dca_orders(self):
         try:
-            with open(f'user_data/dca_orders_{self.buy_rsi}_history', 'a') as f:
+            with open(f'user_data/dca_orders_{self.dca_rsi}_history', 'a') as f:
                 for k in self.dca_orders.keys():
                     if not self.dca_orders[k][2]:
                         f.write(f'{self.dca_orders[k][1]}: {k} - Stake: {self.dca_orders[k][0]}\n')
                         self.dca_orders[k][2] = True
                 f.close()
 
-            with open(f'user_data/dca_orders_{self.buy_rsi}', 'wb') as handle:
+            with open(f'user_data/dca_orders_{self.dca_rsi}', 'wb') as handle:
                 pickle.dump(self.dca_orders, handle, protocol=pickle.HIGHEST_PROTOCOL)
         except:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -251,17 +276,27 @@ class DcaBasedStrategy(IStrategy):
 
     def informative_pairs(self):
         pairs = self.dp.current_whitelist()
-        informative_pairs = [(pair, self.higher_timeframe) for pair in pairs]
+        informative_pairs = []
+        for _ in self.informative_timeframes:
+            informative_pairs.extend([(pair, _) for pair in pairs])
         return informative_pairs
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
+        # actual_dataframe = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe=self.timeframe)
+        higher_dataframe = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe=self.higher_timeframe)
         # self.get_recommendation(dataframe, metadata['pair'].replace('/', ''))
+
+        # dataframe[f'close_{self.timeframe}'] = actual_dataframe['close']
+        # dataframe[f'close_{self.higher_timeframe}'] = higher_dataframe['close']
+
         dataframe['adx'] = ta.ADX(dataframe, timeperiod=14)
         # dataframe['sar'] = ta.SAR(dataframe)
         # dataframe['tema'] = ta.TEMA(dataframe, timeperiod=9)
         dataframe['sma9'] = ta.SMA(dataframe, timeperiod=9)
         dataframe['sma20'] = ta.SMA(dataframe, timeperiod=20)
+        dataframe[f'sma9_{self.higher_timeframe}'] = ta.SMA(higher_dataframe, timeperiod=9)
+        dataframe[f'sma20_{self.higher_timeframe}'] = ta.SMA(higher_dataframe, timeperiod=20)
         # dataframe['hour'] = dataframe['date'].dt.hour
         dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
         dataframe['ema_fast'] = ta.EMA(dataframe, timeperiod=23)
@@ -274,23 +309,15 @@ class DcaBasedStrategy(IStrategy):
         return dataframe
 
     def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
-        if self.confirm_buy_higher_frame(metadata['pair']):
-            dataframe.loc[
-                (
-                        (dataframe['volume'].gt(0))
-                        # &
-                        # (qtpylib.crossed_above(dataframe['rsi'],self.buy_rsi))
-                ),
-                'buy'] = 1
-        else:
-            dataframe.loc[
-                (
-                        (dataframe['volume'].gt(0))
-                        # &
-                        # (qtpylib.crossed_above(dataframe['rsi'],self.buy_rsi))
-                ),
-                'buy'] = 0
+        dataframe.loc[
+            (
+                    (dataframe['volume'].gt(0)) &
+                    (dataframe['sma9'] > dataframe['sma20']) &
+                    (dataframe[f'sma9_{self.higher_timeframe}'] > dataframe[f'sma20_{self.higher_timeframe}']) &
+                    (dataframe['rsi'] >= self.buy_rsi_min) &
+                    (dataframe['rsi'] <= self.buy_rsi_max)
+            ),
+            'buy'] = 1
         return dataframe
 
     def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
