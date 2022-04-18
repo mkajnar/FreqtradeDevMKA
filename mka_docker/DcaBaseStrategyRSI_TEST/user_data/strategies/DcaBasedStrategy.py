@@ -322,12 +322,11 @@ class DcaBasedStrategy(IStrategy):
     def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                    (dataframe['volume'].gt(0))
-                    # &
-                    # (dataframe['sma9'] > dataframe['sma20']) &
-                    # (dataframe[f'sma9_{self.higher_timeframe}'] > dataframe[f'sma20_{self.higher_timeframe}']) &
-                    # (dataframe['rsi'] >= self.buy_rsi_min) &
-                    # (dataframe['rsi'] <= self.buy_rsi_max)
+                    (dataframe['volume'].gt(0)) &
+                    (dataframe['sma9'] > dataframe['sma20']) &
+                    (dataframe[f'sma9_{self.higher_timeframe}'] > dataframe[f'sma20_{self.higher_timeframe}']) &
+                    (dataframe['rsi'] >= self.buy_rsi_min) &
+                    (dataframe['rsi'] <= self.buy_rsi_max)
             ),
             'buy'] = 1
         return dataframe
