@@ -1,4 +1,4 @@
-stoploss = -0.30
+stoploss = -0.07
 use_sell_signal = True
 trailing_stop = True
 trailing_stop_positive = 0.010

@@ -23,16 +23,14 @@ class DcaBasedStrategy(IStrategy):
 
     def __init__(self, config: dict):
         super().__init__(config)
-        self.dca_rsi = 35
+        self.dca_rsi = 40
         self.buy_rsi_min = 20
-        self.buy_rsi_max = 50
-        self.timeframe = '1m'
-
-        self.informative_timeframes = ['3m', '5m']
-
-        self.higher_timeframe = '5m'
+        self.buy_rsi_max = 40
+        self.timeframe = '1h'
+        self.informative_timeframes = ['1h', '4h']
+        self.higher_timeframe = '4h'
         # jen debug
-        self.dca_wait_secs = 60
+        self.dca_wait_secs = 30*60
         # self.dca_wait_secs = 300
         # self.minimal_roi = {
         #                       "0": 0.003
@@ -40,6 +38,7 @@ class DcaBasedStrategy(IStrategy):
         self.minimal_roi = get_rois()
 
         self.stoploss = stoploss
+        # self.use_custom_stoploss = True
         self.use_sell_signal = use_sell_signal
         self.trailing_stop = trailing_stop
         self.trailing_stop_positive = trailing_stop_positive
@@ -147,8 +146,8 @@ class DcaBasedStrategy(IStrategy):
                 if current_profit > dca_percent:
                     return None
 
-                if last_candle['rsi'] > self.dca_rsi:
-                    return None
+                #if last_candle['rsi'] > self.dca_rsi:
+                #    return None
 
                 if last_candle['close'] < previous_candle['close']:
                     return None
@@ -178,6 +177,18 @@ class DcaBasedStrategy(IStrategy):
             pass
 
         return None
+
+    # def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
+    #                     current_rate: float, current_profit: float, **kwargs) -> float:
+    #
+    #     # Make sure you have the longest interval first - these conditions are evaluated from top to bottom.
+    #     if current_time - timedelta(minutes=180) > trade.open_date:
+    #         return -0.03
+    #     if current_time - timedelta(minutes=120) > trade.open_date:
+    #         return -0.05
+    #     elif current_time - timedelta(minutes=60) > trade.open_date:
+    #         return -0.10
+    #     return 1
 
     # def confirm_buy_higher_frame(self, pair, dataframe):
     #     try:
@@ -311,11 +322,12 @@ class DcaBasedStrategy(IStrategy):
     def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                    (dataframe['volume'].gt(0)) &
-                    (dataframe['sma9'] > dataframe['sma20']) &
-                    (dataframe[f'sma9_{self.higher_timeframe}'] > dataframe[f'sma20_{self.higher_timeframe}']) &
-                    (dataframe['rsi'] >= self.buy_rsi_min) &
-                    (dataframe['rsi'] <= self.buy_rsi_max)
+                    (dataframe['volume'].gt(0))
+                    # &
+                    # (dataframe['sma9'] > dataframe['sma20']) &
+                    # (dataframe[f'sma9_{self.higher_timeframe}'] > dataframe[f'sma20_{self.higher_timeframe}']) &
+                    # (dataframe['rsi'] >= self.buy_rsi_min) &
+                    # (dataframe['rsi'] <= self.buy_rsi_max)
             ),
             'buy'] = 1
         return dataframe
