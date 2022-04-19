@@ -26,11 +26,11 @@ class DcaBasedStrategy(IStrategy):
         self.dca_rsi = 40
         self.buy_rsi_min = 20
         self.buy_rsi_max = 40
-        self.timeframe = '1h'
-        self.informative_timeframes = ['1h', '4h']
-        self.higher_timeframe = '4h'
+        self.timeframe = '1m'
+        self.informative_timeframes = ['1m', '15m']
+        self.higher_timeframe = '15m'
         # jen debug
-        self.dca_wait_secs = 30*60
+        self.dca_wait_secs = 10*60
         # self.dca_wait_secs = 300
         # self.minimal_roi = {
         #                       "0": 0.003
@@ -38,7 +38,7 @@ class DcaBasedStrategy(IStrategy):
         self.minimal_roi = get_rois()
 
         self.stoploss = stoploss
-        # self.use_custom_stoploss = True
+        #self.use_custom_stoploss = True
         self.use_sell_signal = use_sell_signal
         self.trailing_stop = trailing_stop
         self.trailing_stop_positive = trailing_stop_positive
@@ -146,8 +146,8 @@ class DcaBasedStrategy(IStrategy):
                 if current_profit > dca_percent:
                     return None
 
-                #if last_candle['rsi'] > self.dca_rsi:
-                #    return None
+                if last_candle['rsi'] > self.dca_rsi:
+                    return None
 
                 if last_candle['close'] < previous_candle['close']:
                     return None
@@ -178,17 +178,17 @@ class DcaBasedStrategy(IStrategy):
 
         return None
 
-    # def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
-    #                     current_rate: float, current_profit: float, **kwargs) -> float:
-    #
-    #     # Make sure you have the longest interval first - these conditions are evaluated from top to bottom.
-    #     if current_time - timedelta(minutes=180) > trade.open_date:
-    #         return -0.03
-    #     if current_time - timedelta(minutes=120) > trade.open_date:
-    #         return -0.05
-    #     elif current_time - timedelta(minutes=60) > trade.open_date:
-    #         return -0.10
-    #     return 1
+    #def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
+    #                    current_rate: float, current_profit: float, **kwargs) -> float:
+
+        # Make sure you have the longest interval first - these conditions are evaluated from top to bottom.
+    #    if current_time - timedelta(minutes=180) > trade.open_date:
+    #        return -0.03
+    #    if current_time - timedelta(minutes=120) > trade.open_date:
+    #        return -0.05
+    #    elif current_time - timedelta(minutes=60) > trade.open_date:
+    #        return -0.10
+    #    return 1
 
     # def confirm_buy_higher_frame(self, pair, dataframe):
     #     try:
