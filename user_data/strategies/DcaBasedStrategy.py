@@ -39,7 +39,7 @@ class DcaBasedStrategy(IStrategy):
         self.minimal_roi = get_rois()
 
         self.stoploss = stoploss
-        # self.use_custom_stoploss = True
+        #self.use_custom_stoploss = True
         self.use_sell_signal = use_sell_signal
         self.trailing_stop = trailing_stop
         self.trailing_stop_positive = trailing_stop_positive
@@ -284,12 +284,13 @@ class DcaBasedStrategy(IStrategy):
     def confirm_trade_exit(self, pair: str, trade: Trade, order_type: str, amount: float,
                            rate: float, time_in_force: str, sell_reason: str, **kwargs) -> bool:
         try:
-            if sell_reason == 'stop_loss' or 'sell' in sell_reason:
-                if 'force' in sell_reason or sell_reason.startswith('stop_loss'):
-                    _block_year = datetime.datetime.now() + timedelta(days=365)
-                    self.lock_pair(pair=pair, until=_block_year, reason=sell_reason)
-                    pass
+            if 'stop_loss' == sell_reason:
+                self.block_pair(pair=pair,sell_reason=sell_reason)
                 return True
+            if 'force_exit' == sell_reason:
+                self.block_pair(pair=pair, sell_reason=sell_reason)
+                return True
+            #other
             pr = trade.calc_profit_ratio(rate)
             if pr <= 0:
                 return False
@@ -300,6 +301,16 @@ class DcaBasedStrategy(IStrategy):
             pass
 
         return True
+
+    def block_pair(self, pair, sell_reason):
+        try:
+            _block_year = datetime.datetime.now() + timedelta(days=365)
+            self.lock_pair(pair=pair, until=_block_year, reason=sell_reason)
+        except:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print('{} - {} - {}'.format(exc_type, fname, exc_tb.tb_lineno))
+            pass
 
     def informative_pairs(self):
         pairs = self.dp.current_whitelist()
