@@ -30,7 +30,8 @@ class DcaBasedStrategy(IStrategy):
         self.informative_timeframes = ['1m', '15m']
         self.higher_timeframe = '15m'
         # jen debug
-        self.dca_wait_secs = 10*60
+        self.dca_debug = False
+        self.dca_wait_secs = 10 * 60
         # self.dca_wait_secs = 300
         # self.minimal_roi = {
         #                       "0": 0.003
@@ -38,7 +39,7 @@ class DcaBasedStrategy(IStrategy):
         self.minimal_roi = get_rois()
 
         self.stoploss = stoploss
-        #self.use_custom_stoploss = True
+        # self.use_custom_stoploss = True
         self.use_sell_signal = use_sell_signal
         self.trailing_stop = trailing_stop
         self.trailing_stop_positive = trailing_stop_positive
@@ -135,22 +136,27 @@ class DcaBasedStrategy(IStrategy):
             if last_candle is not None and previous_candle is not None:
 
                 if trade.pair in self.dca_orders.keys():
-                    t = (datetime.datetime.now() - self.dca_orders[trade.pair][1])
+                    t = (datetime.datetime.now() - self.dca_orders[trade.pair]["changed"])
                     if t.total_seconds() <= self.dca_wait_secs:
                         return None
                 else:
-                    self.dca_orders[trade.pair] = [filled_buys[0].cost, datetime.datetime.now(), False]
+                    dca_item = {"current_rate": current_rate, "current_profit": current_profit,
+                                "stake_amount": filled_buys[0].cost, "changed": datetime.datetime.now(), "saved": False}
+
+                    self.dca_orders[trade.pair] = dca_item
                     self.save_dca_orders()
                     return None
 
-                if current_profit > dca_percent:
-                    return None
+                if not self.dca_debug:
 
-                if last_candle['rsi'] > self.dca_rsi:
-                    return None
+                    if current_profit > dca_percent:
+                        return None
 
-                if last_candle['close'] < previous_candle['close']:
-                    return None
+                    if last_candle['rsi'] > self.dca_rsi:
+                        return None
+
+                    if last_candle['close'] < previous_candle['close']:
+                        return None
 
                 if 0 < count_of_buys <= self.max_dca_orders:
                     try:
@@ -160,7 +166,11 @@ class DcaBasedStrategy(IStrategy):
                         stake_amount = stake_amount * (1 + (count_of_buys * self.dca_koef))
 
                         # zapis casu dle meny
-                        self.dca_orders[trade.pair] = [stake_amount, datetime.datetime.now(), False]
+
+                        dca_item = {"current_rate": current_rate, "current_profit": current_profit,
+                                    "stake_amount": stake_amount, "changed": datetime.datetime.now(), "saved": False}
+
+                        self.dca_orders[trade.pair] = dca_item
                         # ulozit hned na disk
                         self.save_dca_orders()
                         return stake_amount
@@ -178,10 +188,10 @@ class DcaBasedStrategy(IStrategy):
 
         return None
 
-    #def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
+    # def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
     #                    current_rate: float, current_profit: float, **kwargs) -> float:
 
-        # Make sure you have the longest interval first - these conditions are evaluated from top to bottom.
+    # Make sure you have the longest interval first - these conditions are evaluated from top to bottom.
     #    if current_time - timedelta(minutes=180) > trade.open_date:
     #        return -0.03
     #    if current_time - timedelta(minutes=120) > trade.open_date:
@@ -249,12 +259,18 @@ class DcaBasedStrategy(IStrategy):
             pass
 
     def save_dca_orders(self):
+
+        # dca_item = {"current_rate": current_rate, "current_profit": current_profit,
+        #             "stake_amount": stake_amount, "changed": datetime.datetime.now(), "saved": False}
+
         try:
             with open(f'user_data/dca_orders_{self.dca_rsi}_history', 'a') as f:
                 for k in self.dca_orders.keys():
-                    if not self.dca_orders[k][2]:
-                        f.write(f'{self.dca_orders[k][1]}: {k} - Stake: {self.dca_orders[k][0]}\n')
-                        self.dca_orders[k][2] = True
+                    if not self.dca_orders[k]["saved"]:
+                        f.write(
+                            f'{self.dca_orders[k]["changed"]}: {k} - Stake: {self.dca_orders[k]["stake_amount"]},'
+                            f' Rate: {self.dca_orders[k]["current_rate"]}, Profit: {self.dca_orders[k]["current_profit"]}\n')
+                        self.dca_orders[k]["saved"] = True
                 f.close()
 
             with open(f'user_data/dca_orders_{self.dca_rsi}', 'wb') as handle:
@@ -320,15 +336,27 @@ class DcaBasedStrategy(IStrategy):
         return dataframe
 
     def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        dataframe.loc[
-            (
-                    (dataframe['volume'].gt(0)) &
-                    (dataframe['sma9'] > dataframe['sma20']) &
-                    (dataframe[f'sma9_{self.higher_timeframe}'] > dataframe[f'sma20_{self.higher_timeframe}']) &
-                    (dataframe['rsi'] >= self.buy_rsi_min) &
-                    (dataframe['rsi'] <= self.buy_rsi_max)
-            ),
-            'buy'] = 1
+        if self.dca_debug:
+            dataframe.loc[
+                (
+                        (dataframe['volume'].gt(0))
+                        # &
+                        # (dataframe['sma9'] > dataframe['sma20']) &
+                        # (dataframe[f'sma9_{self.higher_timeframe}'] > dataframe[f'sma20_{self.higher_timeframe}']) &
+                        # (dataframe['rsi'] >= self.buy_rsi_min) &
+                        # (dataframe['rsi'] <= self.buy_rsi_max)
+                ),
+                'buy'] = 1
+        else:
+            dataframe.loc[
+                (
+                        (dataframe['volume'].gt(0)) &
+                        (dataframe['sma9'] > dataframe['sma20']) &
+                        (dataframe[f'sma9_{self.higher_timeframe}'] > dataframe[f'sma20_{self.higher_timeframe}']) &
+                        (dataframe['rsi'] >= self.buy_rsi_min) &
+                        (dataframe['rsi'] <= self.buy_rsi_max)
+                ),
+                'buy'] = 1
         return dataframe
 
     def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
