@@ -26,9 +26,9 @@ class DcaBasedStrategy(IStrategy):
         self.dca_rsi = 40
         self.buy_rsi_min = 20
         self.buy_rsi_max = 40
-        self.timeframe = '1m'
-        self.informative_timeframes = ['1m', '15m']
-        self.higher_timeframe = '15m'
+        self.timeframe = '15m'
+        self.informative_timeframes = ['15m', '1h']
+        self.higher_timeframe = '1h'
         # jen debug
         self.dca_debug = False
         self.dca_wait_secs = 10 * 60
