@@ -12,7 +12,7 @@ from freqtrade.constants import DEFAULT_CONFIG
 
 ARGS_COMMON = ["verbosity", "logfile", "version", "config", "datadir", "user_data_dir"]
 
-ARGS_STRATEGY = ["strategy", "strategy_path"]
+ARGS_STRATEGY = ["strategy", "strategy_path", "recursive_strategy_search"]
 
 ARGS_TRADE = ["db_url", "sd_notify", "dry_run", "dry_run_wallet", "fee"]
 
@@ -24,7 +24,7 @@ ARGS_COMMON_OPTIMIZE = ["timeframe", "timerange", "dataformat_ohlcv",
 ARGS_BACKTEST = ARGS_COMMON_OPTIMIZE + ["position_stacking", "use_max_market_positions",
                                         "enable_protections", "dry_run_wallet", "timeframe_detail",
                                         "strategy_list", "export", "exportfilename",
-                                        "backtest_breakdown"]
+                                        "backtest_breakdown", "backtest_cache"]
 
 ARGS_HYPEROPT = ARGS_COMMON_OPTIMIZE + ["hyperopt", "hyperopt_path",
                                         "position_stacking", "use_max_market_positions",
@@ -37,7 +37,8 @@ ARGS_HYPEROPT = ARGS_COMMON_OPTIMIZE + ["hyperopt", "hyperopt_path",
 
 ARGS_EDGE = ARGS_COMMON_OPTIMIZE + ["stoploss_range"]
 
-ARGS_LIST_STRATEGIES = ["strategy_path", "print_one_column", "print_colorized"]
+ARGS_LIST_STRATEGIES = ["strategy_path", "print_one_column", "print_colorized",
+                        "recursive_strategy_search"]
 
 ARGS_LIST_HYPEROPTS = ["hyperopt_path", "print_one_column", "print_colorized"]
 
@@ -48,10 +49,11 @@ ARGS_LIST_EXCHANGES = ["print_one_column", "list_exchanges_all"]
 ARGS_LIST_TIMEFRAMES = ["exchange", "print_one_column"]
 
 ARGS_LIST_PAIRS = ["exchange", "print_list", "list_pairs_print_json", "print_one_column",
-                   "print_csv", "base_currencies", "quote_currencies", "list_pairs_all"]
+                   "print_csv", "base_currencies", "quote_currencies", "list_pairs_all",
+                   "trading_mode"]
 
 ARGS_TEST_PAIRLIST = ["verbosity", "config", "quote_currencies", "print_one_column",
-                      "list_pairs_print_json"]
+                      "list_pairs_print_json", "exchange"]
 
 ARGS_CREATE_USERDIR = ["user_data_dir", "reset"]
 
@@ -60,22 +62,24 @@ ARGS_BUILD_CONFIG = ["config"]
 ARGS_BUILD_STRATEGY = ["user_data_dir", "strategy", "template"]
 
 ARGS_CONVERT_DATA = ["pairs", "format_from", "format_to", "erase"]
-ARGS_CONVERT_DATA_OHLCV = ARGS_CONVERT_DATA + ["timeframes"]
+
+ARGS_CONVERT_DATA_OHLCV = ARGS_CONVERT_DATA + ["timeframes", "exchange", "trading_mode",
+                                               "candle_types"]
 
 ARGS_CONVERT_TRADES = ["pairs", "timeframes", "exchange", "dataformat_ohlcv", "dataformat_trades"]
 
-ARGS_LIST_DATA = ["exchange", "dataformat_ohlcv", "pairs"]
+ARGS_LIST_DATA = ["exchange", "dataformat_ohlcv", "pairs", "trading_mode"]
 
 ARGS_DOWNLOAD_DATA = ["pairs", "pairs_file", "days", "new_pairs_days", "include_inactive",
                       "timerange", "download_trades", "exchange", "timeframes",
-                      "erase", "dataformat_ohlcv", "dataformat_trades"]
+                      "erase", "dataformat_ohlcv", "dataformat_trades", "trading_mode"]
 
 ARGS_PLOT_DATAFRAME = ["pairs", "indicators1", "indicators2", "plot_limit",
                        "db_url", "trade_source", "export", "exportfilename",
                        "timerange", "timeframe", "no_trades"]
 
 ARGS_PLOT_PROFIT = ["pairs", "timerange", "export", "exportfilename", "db_url",
-                    "trade_source", "timeframe", "plot_auto_open"]
+                    "trade_source", "timeframe", "plot_auto_open", ]
 
 ARGS_INSTALL_UI = ["erase_ui_only", 'ui_version']
 

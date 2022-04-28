@@ -2,17 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6eaaa009-da80-48ae-a916-fd3e9d4d515c" name="Default Changelist" comment="Optimalisation">
-      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/deploy.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/docker-compose.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/start.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/user_data/configs/blacklist-kucoin.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/user_data/configs/config.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/user_data/configs/pairlist-volume-kucoin-usdt.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/user_data/strategies/DcaBasedStrategyRsi30.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/user_data/strategies/DcaBasedStrategyRsi40.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/user_data/strategies/DcaBasedStrategyRsi50.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Freqtrade.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Freqtrade.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/user_data/strategies/DcaBasedStrategy.py" beforeDir="false" afterPath="$PROJECT_DIR$/mka_docker/DcaBaseStrategyRSI_TEST/user_data/strategies/DcaBasedStrategy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_data/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/user_data/config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_data/strategies/DcaBasedStrategy.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_data/strategies/DcaBasedStrategy.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -207,6 +202,7 @@
       <workItem from="1647349431514" duration="56000" />
       <workItem from="1647891363738" duration="405000" />
       <workItem from="1647892245372" duration="996000" />
+      <workItem from="1651179808475" duration="183000" />
     </task>
     <task id="LOCAL-00001" summary="Optimalisation">
       <created>1647900188947</created>

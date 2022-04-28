@@ -1,3 +1,2 @@
 [console_scripts]
 freqtrade = freqtrade.main:main
-

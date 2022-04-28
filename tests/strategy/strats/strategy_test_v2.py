@@ -1,10 +1,13 @@
 # pragma pylint: disable=missing-docstring, invalid-name, pointless-string-statement
 
+from datetime import datetime
+
 import talib.abstract as ta
 from pandas import DataFrame
 
 import freqtrade.vendor.qtpylib.indicators as qtpylib
-from freqtrade.strategy.interface import IStrategy
+from freqtrade.persistence import Trade
+from freqtrade.strategy import IStrategy
 
 
 class StrategyTestV2(IStrategy):
@@ -33,8 +36,8 @@ class StrategyTestV2(IStrategy):
 
     # Optional order type mapping
     order_types = {
-        'buy': 'limit',
-        'sell': 'limit',
+        'entry': 'limit',
+        'exit': 'limit',
         'stoploss': 'limit',
         'stoploss_on_exchange': False
     }
@@ -44,22 +47,14 @@ class StrategyTestV2(IStrategy):
 
     # Optional time in force for orders
     order_time_in_force = {
-        'buy': 'gtc',
-        'sell': 'gtc',
+        'entry': 'gtc',
+        'exit': 'gtc',
     }
+    # Test legacy use_sell_signal definition
+    use_sell_signal = False
 
-    def informative_pairs(self):
-        """
-        Define additional, informative pair/interval combinations to be cached from the exchange.
-        These pair/interval combinations are non-tradeable, unless they are part
-        of the whitelist as well.
-        For more information, please consult the documentation
-        :return: List of tuples in the format (pair, interval)
-            Sample: return [("ETH/USDT", "5m"),
-                            ("BTC/USDT", "15m"),
-                            ]
-        """
-        return []
+    # By default this strategy does not use Position Adjustments
+    position_adjustment_enable = False
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         """
@@ -154,3 +149,12 @@ class StrategyTestV2(IStrategy):
             ),
             'sell'] = 1
         return dataframe
+
+    def adjust_trade_position(self, trade: Trade, current_time: datetime, current_rate: float,
+                              current_profit: float, min_stake: float, max_stake: float, **kwargs):
+
+        if current_profit < -0.0075:
+            orders = trade.select_filled_orders('buy')
+            return round(orders[0].cost, 0)
+
+        return None

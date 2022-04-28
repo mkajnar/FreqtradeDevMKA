@@ -1,6 +1,6 @@
 # Exchange-specific Notes
 
-This page combines common gotchas and informations which are exchange-specific and most likely don't apply to other exchanges.
+This page combines common gotchas and Information which are exchange-specific and most likely don't apply to other exchanges.
 
 ## Exchange configuration
 
@@ -57,12 +57,34 @@ This configuration enables kraken, as well as rate-limiting to avoid bans from t
 Binance supports [time_in_force](configuration.md#understand-order_time_in_force).
 
 !!! Tip "Stoploss on Exchange"
-    Binance supports `stoploss_on_exchange` and uses stop-loss-limit orders. It provides great advantages, so we recommend to benefit from it.
+    Binance supports `stoploss_on_exchange` and uses `stop-loss-limit` orders. It provides great advantages, so we recommend to benefit from it by enabling stoploss on exchange..
 
 ### Binance Blacklist
 
 For Binance, please add `"BNB/<STAKE>"` to your blacklist to avoid issues.
 Accounts having BNB accounts use this to pay for fees - if your first trade happens to be on `BNB`, further trades will consume this position and make the initial BNB trade unsellable as the expected amount is not there anymore.
+
+### Binance Futures
+
+Binance has specific (unfortunately complex) [Futures Trading Quantitative Rules](https://www.binance.com/en/support/faq/4f462ebe6ff445d4a170be7d9e897272) which need to be followed, and which prohibit a too low stake-amount (among others) for too many orders.
+Violating these rules will result in a trading restriction.
+
+When trading on Binance Futures market, orderbook must be used because there is no price ticker data for futures.
+
+``` jsonc
+  "entry_pricing": {
+      "use_order_book": true,
+      "order_book_top": 1,
+      "check_depth_of_market": {
+          "enabled": false,
+          "bids_to_ask_delta": 1
+      }
+  },
+  "exit_pricing": {
+      "use_order_book": true,
+      "order_book_top": 1
+  },
+```
 
 ### Binance sites
 
@@ -177,18 +199,27 @@ Kucoin requires a passphrase for each api key, you will therefore need to add th
 
 Kucoin supports [time_in_force](configuration.md#understand-order_time_in_force).
 
+!!! Tip "Stoploss on Exchange"
+    Kucoin supports `stoploss_on_exchange` and can use both stop-loss-market and stop-loss-limit orders. It provides great advantages, so we recommend to benefit from it.
+    You can use either `"limit"` or `"market"` in the `order_types.stoploss` configuration setting to decide which type of stoploss shall be used.
+
 ### Kucoin Blacklists
 
 For Kucoin, please add `"KCS/<STAKE>"` to your blacklist to avoid issues.
 Accounts having KCS accounts use this to pay for fees - if your first trade happens to be on `KCS`, further trades will consume this position and make the initial KCS trade unsellable as the expected amount is not there anymore.
 
-## OKEX
+## Huobi
 
-OKEX requires a passphrase for each api key, you will therefore need to add this key into the configuration so your exchange section looks as follows:
+!!! Tip "Stoploss on Exchange"
+    Huobi supports `stoploss_on_exchange` and uses `stop-limit` orders. It provides great advantages, so we recommend to benefit from it by enabling stoploss on exchange.
+
+## OKX (former OKEX)
+
+OKX requires a passphrase for each api key, you will therefore need to add this key into the configuration so your exchange section looks as follows:
 
 ```json
 "exchange": {
-    "name": "okex",
+    "name": "okx",
     "key": "your_exchange_key",
     "secret": "your_exchange_secret",
     "password": "your_exchange_api_key_password",
@@ -197,9 +228,12 @@ OKEX requires a passphrase for each api key, you will therefore need to add this
 ```
 
 !!! Warning
-    OKEX only provides 100 candles per api call. Therefore, the strategy will only have a pretty low amount of data available in backtesting mode.
+    OKX only provides 100 candles per api call. Therefore, the strategy will only have a pretty low amount of data available in backtesting mode.
 
 ## Gate.io
+
+!!! Tip "Stoploss on Exchange"
+    Gate.io supports `stoploss_on_exchange` and uses `stop-loss-limit` orders. It provides great advantages, so we recommend to benefit from it by enabling stoploss on exchange..
 
 Gate.io allows the use of `POINT` to pay for fees. As this is not a tradable currency (no regular market available), automatic fee calculations will fail (and default to a fee of 0).
 The configuration parameter `exchange.unknown_fee_rate` can be used to specify the exchange rate between Point and the stake currency. Obviously, changing the stake-currency will also require changes to this value.

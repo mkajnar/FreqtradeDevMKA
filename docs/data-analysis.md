@@ -1,6 +1,6 @@
-# Analyzing bot data with Jupyter notebooks  
+# Analyzing bot data with Jupyter notebooks
 
-You can analyze the results of backtests and trading history easily using Jupyter notebooks. Sample notebooks are located at `user_data/notebooks/` after initializing the user directory with `freqtrade create-userdir --userdir user_data`.  
+You can analyze the results of backtests and trading history easily using Jupyter notebooks. Sample notebooks are located at `user_data/notebooks/` after initializing the user directory with `freqtrade create-userdir --userdir user_data`.
 
 ## Quick start with docker
 
@@ -41,32 +41,35 @@ ipython kernel install --user --name=freqtrade
 !!! Warning
     Some tasks don't work especially well in notebooks. For example, anything using asynchronous execution is a problem for Jupyter. Also, freqtrade's primary entry point is the shell cli, so using pure python in a notebook bypasses arguments that provide required objects and parameters to helper functions. You may need to set those values or create expected objects manually.
 
-## Recommended workflow  
+## Recommended workflow
 
-| Task | Tool |  
-  --- | ---  
-Bot operations | CLI  
+| Task | Tool |
+  --- | ---
+Bot operations | CLI
 Repetitive tasks | Shell scripts
-Data analysis & visualization | Notebook  
+Data analysis & visualization | Notebook
 
 1. Use the CLI to
+
     * download historical data
     * run a backtest
     * run with real-time data
-    * export results  
+    * export results
 
 1. Collect these actions in shell scripts
+
     * save complicated commands with arguments
-    * execute multi-step operations  
+    * execute multi-step operations
     * automate testing strategies and preparing data for analysis
 
 1. Use a notebook to
+
     * visualize data
-    * munge and plot to generate insights
+    * mangle and plot to generate insights
 
-## Example utility snippets  
+## Example utility snippets
 
-### Change directory to root  
+### Change directory to root
 
 Jupyter notebooks execute from the notebook directory. The following snippet searches for the project root, so relative paths remain consistent.
 
@@ -119,5 +122,6 @@ Best avoid relative paths, since this starts at the storage location of the jupy
 
 * [Strategy debugging](strategy_analysis_example.md) - also available as Jupyter notebook (`user_data/notebooks/strategy_analysis_example.ipynb`)
 * [Plotting](plotting.md)
+* [Tag Analysis](advanced-backtesting.md)
 
 Feel free to submit an issue or Pull Request enhancing this document if you would like to share ideas on how to best analyze the data.

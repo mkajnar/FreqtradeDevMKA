@@ -4,17 +4,18 @@ import logging
 import time
 from unittest.mock import MagicMock, PropertyMock
 
+import pandas as pd
 import pytest
 import time_machine
 
 from freqtrade.constants import AVAILABLE_PAIRLISTS
-from freqtrade.enums import RunMode
+from freqtrade.enums import CandleType, RunMode
 from freqtrade.exceptions import OperationalException
 from freqtrade.persistence import Trade
 from freqtrade.plugins.pairlist.pairlist_helpers import expand_pairlist
 from freqtrade.plugins.pairlistmanager import PairListManager
 from freqtrade.resolvers import PairListResolver
-from tests.conftest import (create_mock_trades, get_patched_exchange, get_patched_freqtradebot,
+from tests.conftest import (create_mock_trades_usdt, get_patched_exchange, get_patched_freqtradebot,
                             log_has, log_has_re, num_log_has)
 
 
@@ -490,11 +491,11 @@ def test_VolumePairList_whitelist_gen(mocker, whitelist_conf, shitcoinmarkets, t
     ohlcv_history_high_vola.loc[ohlcv_history_high_vola.index == 1, 'close'] = 0.00090
 
     ohlcv_data = {
-        ('ETH/BTC', '1d'): ohlcv_history,
-        ('TKN/BTC', '1d'): ohlcv_history,
-        ('LTC/BTC', '1d'): ohlcv_history.append(ohlcv_history),
-        ('XRP/BTC', '1d'): ohlcv_history,
-        ('HOT/BTC', '1d'): ohlcv_history_high_vola,
+        ('ETH/BTC', '1d', CandleType.SPOT): ohlcv_history,
+        ('TKN/BTC', '1d', CandleType.SPOT): ohlcv_history,
+        ('LTC/BTC', '1d', CandleType.SPOT): pd.concat([ohlcv_history, ohlcv_history]),
+        ('XRP/BTC', '1d', CandleType.SPOT): ohlcv_history,
+        ('HOT/BTC', '1d', CandleType.SPOT): ohlcv_history_high_vola,
     }
 
     mocker.patch('freqtrade.exchange.Exchange.exchange_has', MagicMock(return_value=True))
@@ -586,10 +587,10 @@ def test_VolumePairList_whitelist_gen(mocker, whitelist_conf, shitcoinmarkets, t
     ([{"method": "VolumePairList", "number_assets": 5, "sort_key": "quoteVolume",
        "lookback_timeframe": "1d", "lookback_period": 1, "refresh_period": 86400}],
      "BTC", "binance", ['LTC/BTC', 'ETH/BTC', 'TKN/BTC', 'XRP/BTC', 'HOT/BTC']),
-    # expecting pairs from default tickers, because 1h candles are not available
+    # expecting pairs as input, because 1h candles are not available
     ([{"method": "VolumePairList", "number_assets": 5, "sort_key": "quoteVolume",
        "lookback_timeframe": "1h", "lookback_period": 2, "refresh_period": 3600}],
-     "BTC", "binance", ['ETH/BTC', 'TKN/BTC', 'LTC/BTC', 'HOT/BTC', 'FUEL/BTC']),
+     "BTC", "binance", ['ETH/BTC', 'LTC/BTC', 'NEO/BTC', 'TKN/BTC', 'XRP/BTC']),
     # ftx data is already in Quote currency, therefore won't require conversion
     ([{"method": "VolumePairList", "number_assets": 5, "sort_key": "quoteVolume",
        "lookback_timeframe": "1d", "lookback_period": 1, "refresh_period": 86400}],
@@ -618,11 +619,11 @@ def test_VolumePairList_range(mocker, whitelist_conf, shitcoinmarkets, tickers, 
     mocker.patch('freqtrade.exchange.ftx.Ftx.market_is_tradable', return_value=True)
 
     ohlcv_data = {
-        ('ETH/BTC', '1d'): ohlcv_history,
-        ('TKN/BTC', '1d'): ohlcv_history,
-        ('LTC/BTC', '1d'): ohlcv_history_medium_volume,
-        ('XRP/BTC', '1d'): ohlcv_history_high_vola,
-        ('HOT/BTC', '1d'): ohlcv_history_high_volume,
+        ('ETH/BTC', '1d', CandleType.SPOT): ohlcv_history,
+        ('TKN/BTC', '1d', CandleType.SPOT): ohlcv_history,
+        ('LTC/BTC', '1d', CandleType.SPOT): ohlcv_history_medium_volume,
+        ('XRP/BTC', '1d', CandleType.SPOT): ohlcv_history_high_vola,
+        ('HOT/BTC', '1d', CandleType.SPOT): ohlcv_history_high_volume,
     }
 
     mocker.patch('freqtrade.exchange.Exchange.exchange_has', MagicMock(return_value=True))
@@ -714,29 +715,58 @@ def test_ShuffleFilter_init(mocker, whitelist_conf, caplog) -> None:
 
 
 @pytest.mark.usefixtures("init_persistence")
-def test_PerformanceFilter_lookback(mocker, whitelist_conf, fee, caplog) -> None:
-    whitelist_conf['exchange']['pair_whitelist'].append('XRP/BTC')
-    whitelist_conf['pairlists'] = [
+def test_PerformanceFilter_lookback(mocker, default_conf_usdt, fee, caplog) -> None:
+    default_conf_usdt['exchange']['pair_whitelist'].extend(['ADA/USDT', 'XRP/USDT', 'ETC/USDT'])
+    default_conf_usdt['pairlists'] = [
         {"method": "StaticPairList"},
         {"method": "PerformanceFilter", "minutes": 60, "min_profit": 0.01}
     ]
     mocker.patch('freqtrade.exchange.Exchange.exchange_has', MagicMock(return_value=True))
-    exchange = get_patched_exchange(mocker, whitelist_conf)
-    pm = PairListManager(exchange, whitelist_conf)
+    exchange = get_patched_exchange(mocker, default_conf_usdt)
+    pm = PairListManager(exchange, default_conf_usdt)
     pm.refresh_pairlist()
 
-    assert pm.whitelist == ['ETH/BTC', 'TKN/BTC', 'XRP/BTC']
+    assert pm.whitelist == ['ETH/USDT', 'XRP/USDT', 'NEO/USDT', 'TKN/USDT']
 
     with time_machine.travel("2021-09-01 05:00:00 +00:00") as t:
-        create_mock_trades(fee)
+        create_mock_trades_usdt(fee)
         pm.refresh_pairlist()
-        assert pm.whitelist == ['XRP/BTC']
+        assert pm.whitelist == ['XRP/USDT']
         assert log_has_re(r'Removing pair .* since .* is below .*', caplog)
 
         # Move to "outside" of lookback window, so original sorting is restored.
         t.move_to("2021-09-01 07:00:00 +00:00")
         pm.refresh_pairlist()
-        assert pm.whitelist == ['ETH/BTC', 'TKN/BTC', 'XRP/BTC']
+        assert pm.whitelist == ['ETH/USDT', 'XRP/USDT', 'NEO/USDT', 'TKN/USDT']
+
+
+@pytest.mark.usefixtures("init_persistence")
+def test_PerformanceFilter_keep_mid_order(mocker, default_conf_usdt, fee, caplog) -> None:
+    default_conf_usdt['exchange']['pair_whitelist'].extend(['ADA/USDT', 'ETC/USDT'])
+    default_conf_usdt['pairlists'] = [
+        {"method": "StaticPairList", "allow_inactive": True},
+        {"method": "PerformanceFilter", "minutes": 60, }
+    ]
+    mocker.patch('freqtrade.exchange.Exchange.exchange_has', return_value=True)
+    exchange = get_patched_exchange(mocker, default_conf_usdt)
+    pm = PairListManager(exchange, default_conf_usdt)
+    pm.refresh_pairlist()
+
+    assert pm.whitelist == ['ETH/USDT', 'LTC/USDT', 'XRP/USDT',
+                            'NEO/USDT', 'TKN/USDT', 'ADA/USDT', 'ETC/USDT']
+
+    with time_machine.travel("2021-09-01 05:00:00 +00:00") as t:
+        create_mock_trades_usdt(fee)
+        pm.refresh_pairlist()
+        assert pm.whitelist == ['XRP/USDT', 'ETC/USDT', 'ETH/USDT',
+                                'NEO/USDT', 'TKN/USDT', 'ADA/USDT', 'LTC/USDT']
+        # assert log_has_re(r'Removing pair .* since .* is below .*', caplog)
+
+        # Move to "outside" of lookback window, so original sorting is restored.
+        t.move_to("2021-09-01 07:00:00 +00:00")
+        pm.refresh_pairlist()
+        assert pm.whitelist == ['ETH/USDT', 'LTC/USDT', 'XRP/USDT',
+                                'NEO/USDT', 'TKN/USDT', 'ADA/USDT', 'ETC/USDT']
 
 
 def test_gen_pair_whitelist_not_supported(mocker, default_conf, tickers) -> None:
@@ -749,6 +779,19 @@ def test_gen_pair_whitelist_not_supported(mocker, default_conf, tickers) -> None
 
     with pytest.raises(OperationalException,
                        match=r'Exchange does not support dynamic whitelist.*'):
+        get_patched_freqtradebot(mocker, default_conf)
+
+
+def test_pair_whitelist_not_supported_Spread(mocker, default_conf, tickers) -> None:
+    default_conf['pairlists'] = [{'method': 'StaticPairList'}, {'method': 'SpreadFilter'}]
+
+    mocker.patch.multiple('freqtrade.exchange.Exchange',
+                          get_tickers=tickers,
+                          exchange_has=MagicMock(return_value=False),
+                          )
+
+    with pytest.raises(OperationalException,
+                       match=r'Exchange does not support fetchTickers, .*'):
         get_patched_freqtradebot(mocker, default_conf)
 
 
@@ -894,9 +937,9 @@ def test_agefilter_min_days_listed_too_large(mocker, default_conf, markets, tick
 def test_agefilter_caching(mocker, markets, whitelist_conf_agefilter, tickers, ohlcv_history):
     with time_machine.travel("2021-09-01 05:00:00 +00:00") as t:
         ohlcv_data = {
-            ('ETH/BTC', '1d'): ohlcv_history,
-            ('TKN/BTC', '1d'): ohlcv_history,
-            ('LTC/BTC', '1d'): ohlcv_history,
+            ('ETH/BTC', '1d', CandleType.SPOT): ohlcv_history,
+            ('TKN/BTC', '1d', CandleType.SPOT): ohlcv_history,
+            ('LTC/BTC', '1d', CandleType.SPOT): ohlcv_history,
         }
         mocker.patch.multiple(
             'freqtrade.exchange.Exchange',
@@ -918,10 +961,10 @@ def test_agefilter_caching(mocker, markets, whitelist_conf_agefilter, tickers, o
         assert freqtrade.exchange.refresh_latest_ohlcv.call_count == 2
 
         ohlcv_data = {
-            ('ETH/BTC', '1d'): ohlcv_history,
-            ('TKN/BTC', '1d'): ohlcv_history,
-            ('LTC/BTC', '1d'): ohlcv_history,
-            ('XRP/BTC', '1d'): ohlcv_history.iloc[[0]],
+            ('ETH/BTC', '1d', CandleType.SPOT): ohlcv_history,
+            ('TKN/BTC', '1d', CandleType.SPOT): ohlcv_history,
+            ('LTC/BTC', '1d', CandleType.SPOT): ohlcv_history,
+            ('XRP/BTC', '1d', CandleType.SPOT): ohlcv_history.iloc[[0]],
         }
         mocker.patch('freqtrade.exchange.Exchange.refresh_latest_ohlcv', return_value=ohlcv_data)
         freqtrade.pairlists.refresh_pairlist()
@@ -939,10 +982,10 @@ def test_agefilter_caching(mocker, markets, whitelist_conf_agefilter, tickers, o
         t.move_to("2021-09-03 01:00:00 +00:00")
         # Called once for XRP/BTC
         ohlcv_data = {
-            ('ETH/BTC', '1d'): ohlcv_history,
-            ('TKN/BTC', '1d'): ohlcv_history,
-            ('LTC/BTC', '1d'): ohlcv_history,
-            ('XRP/BTC', '1d'): ohlcv_history,
+            ('ETH/BTC', '1d', CandleType.SPOT): ohlcv_history,
+            ('TKN/BTC', '1d', CandleType.SPOT): ohlcv_history,
+            ('LTC/BTC', '1d', CandleType.SPOT): ohlcv_history,
+            ('XRP/BTC', '1d', CandleType.SPOT): ohlcv_history,
         }
         mocker.patch('freqtrade.exchange.Exchange.refresh_latest_ohlcv', return_value=ohlcv_data)
         freqtrade.pairlists.refresh_pairlist()
@@ -1003,12 +1046,12 @@ def test_rangestabilityfilter_caching(mocker, markets, default_conf, tickers, oh
                           get_tickers=tickers
                           )
     ohlcv_data = {
-        ('ETH/BTC', '1d'): ohlcv_history,
-        ('TKN/BTC', '1d'): ohlcv_history,
-        ('LTC/BTC', '1d'): ohlcv_history,
-        ('XRP/BTC', '1d'): ohlcv_history,
-        ('HOT/BTC', '1d'): ohlcv_history,
-        ('BLK/BTC', '1d'): ohlcv_history,
+        ('ETH/BTC', '1d', CandleType.SPOT): ohlcv_history,
+        ('TKN/BTC', '1d', CandleType.SPOT): ohlcv_history,
+        ('LTC/BTC', '1d', CandleType.SPOT): ohlcv_history,
+        ('XRP/BTC', '1d', CandleType.SPOT): ohlcv_history,
+        ('HOT/BTC', '1d', CandleType.SPOT): ohlcv_history,
+        ('BLK/BTC', '1d', CandleType.SPOT): ohlcv_history,
     }
     mocker.patch.multiple(
         'freqtrade.exchange.Exchange',
@@ -1167,13 +1210,13 @@ def test_pairlistmanager_no_pairlist(mocker, whitelist_conf):
       {'pair': 'TKN/BTC', 'profit_ratio': -0.0501, 'count': 2},
       {'pair': 'ETH/BTC', 'profit_ratio': -0.0501, 'count': 100}],
      ['TKN/BTC', 'ETH/BTC', 'LTC/BTC']),
-    # Tie in performance and count, broken by alphabetical sort
+    # Tie in performance and count, broken by prior sorting sort
     ([{"method": "StaticPairList"}, {"method": "PerformanceFilter"}],
      ['ETH/BTC', 'TKN/BTC', 'LTC/BTC'],
      [{'pair': 'LTC/BTC', 'profit_ratio': -0.0501, 'count': 1},
       {'pair': 'TKN/BTC', 'profit_ratio': -0.0501, 'count': 1},
       {'pair': 'ETH/BTC', 'profit_ratio': -0.0501, 'count': 1}],
-     ['ETH/BTC', 'LTC/BTC', 'TKN/BTC']),
+     ['ETH/BTC', 'TKN/BTC', 'LTC/BTC']),
 ])
 def test_performance_filter(mocker, whitelist_conf, pairlists, pair_allowlist, overall_performance,
                             allowlist_result, tickers, markets, ohlcv_history_list):

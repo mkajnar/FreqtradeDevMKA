@@ -1,4 +1,4 @@
-ccxt>=1.66.32
+ccxt>=1.79.69
 SQLAlchemy
 python-telegram-bot>=13.4
 arrow>=0.17.0
@@ -24,8 +24,10 @@ tables
 blosc
 fastapi
 uvicorn
+psutil
 pyjwt
 aiofiles
+schedule
 
 [all]
 plotly>=4.0
@@ -48,7 +50,6 @@ scikit-optimize>=0.7.0
 filelock
 joblib
 progressbar2
-psutil
 
 [dev]
 plotly>=4.0
@@ -71,7 +72,6 @@ scikit-optimize>=0.7.0
 filelock
 joblib
 progressbar2
-psutil
 
 [hyperopt]
 scipy
@@ -80,7 +80,6 @@ scikit-optimize>=0.7.0
 filelock
 joblib
 progressbar2
-psutil
 
 [jupyter]
 jupyter

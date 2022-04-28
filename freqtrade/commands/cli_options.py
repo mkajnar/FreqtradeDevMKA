@@ -5,6 +5,7 @@ from argparse import SUPPRESS, ArgumentTypeError
 
 from freqtrade import __version__, constants
 from freqtrade.constants import HYPEROPT_LOSS_BUILTIN
+from freqtrade.enums import CandleType
 
 
 def check_int_positive(value: str) -> int:
@@ -82,6 +83,11 @@ AVAILABLE_CLI_OPTIONS = {
         help='Reset sample files to their original state.',
         action='store_true',
     ),
+    "recursive_strategy_search": Arg(
+        '--recursive-strategy-search',
+        help='Recursively search for a strategy in the strategies folder.',
+        action='store_true',
+    ),
     # Main options
     "strategy": Arg(
         '-s', '--strategy',
@@ -117,7 +123,7 @@ AVAILABLE_CLI_OPTIONS = {
     ),
     # Optimize common
     "timeframe": Arg(
-        '-i', '--timeframe', '--ticker-interval',
+        '-i', '--timeframe',
         help='Specify timeframe (`1m`, `5m`, `30m`, `1h`, `1d`).',
     ),
     "timerange": Arg(
@@ -169,7 +175,7 @@ AVAILABLE_CLI_OPTIONS = {
     "strategy_list": Arg(
         '--strategy-list',
         help='Provide a space-separated list of strategies to backtest. '
-        'Please note that ticker-interval needs to be set either in config '
+        'Please note that timeframe needs to be set either in config '
         'or via command line. When using this together with `--export trades`, '
         'the strategy-name is injected into the filename '
         '(so `backtest-data.json` becomes `backtest-data-SampleStrategy.json`',
@@ -179,14 +185,14 @@ AVAILABLE_CLI_OPTIONS = {
         '--export',
         help='Export backtest results (default: trades).',
         choices=constants.EXPORT_OPTIONS,
-
     ),
     "exportfilename": Arg(
-        '--export-filename',
-        help='Save backtest results to the file with this filename. '
-        'Requires `--export` to be set as well. '
-        'Example: `--export-filename=user_data/backtest_results/backtest_today.json`',
-        metavar='PATH',
+        "--export-filename",
+        "--backtest-filename",
+        help="Use this filename for backtest results."
+        "Requires `--export` to be set as well. "
+        "Example: `--export-filename=user_data/backtest_results/backtest_today.json`",
+        metavar="PATH",
     ),
     "disableparamexport": Arg(
         '--disable-param-export',
@@ -204,6 +210,12 @@ AVAILABLE_CLI_OPTIONS = {
         help='Show backtesting breakdown per [day, week, month].',
         nargs='+',
         choices=constants.BACKTEST_BREAKDOWNS
+    ),
+    "backtest_cache": Arg(
+        '--cache',
+        help='Load a cached backtest result no older than specified age (default: %(default)s).',
+        default=constants.BACKTEST_CACHE_DEFAULT,
+        choices=constants.BACKTEST_CACHE_AGE,
     ),
     # Edge
     "stoploss_range": Arg(
@@ -348,6 +360,17 @@ AVAILABLE_CLI_OPTIONS = {
         help='Specify base currency(-ies). Space-separated list.',
         nargs='+',
         metavar='BASE_CURRENCY',
+    ),
+    "trading_mode": Arg(
+        '--trading-mode',
+        help='Select Trading mode',
+        choices=constants.TRADING_MODES,
+    ),
+    "candle_types": Arg(
+        '--candle-types',
+        help='Select candle type to use',
+        choices=[c.value for c in CandleType],
+        nargs='+',
     ),
     # Script options
     "pairs": Arg(
