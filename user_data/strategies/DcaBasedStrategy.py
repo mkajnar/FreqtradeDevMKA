@@ -25,10 +25,10 @@ class DcaBasedStrategy(IStrategy):
         super().__init__(config)
         self.dca_rsi = 40
         self.buy_rsi_min = 20
-        self.buy_rsi_max = 40
-        self.timeframe = '15m'
-        self.informative_timeframes = ['15m', '1h']
-        self.higher_timeframe = '1h'
+        self.buy_rsi_max = 60
+        self.timeframe = '1m'
+        self.informative_timeframes = ['15m']
+        self.higher_timeframe = '15m'
         # jen debug
         self.dca_debug = False
         self.dca_wait_secs = 10 * 60
@@ -152,8 +152,8 @@ class DcaBasedStrategy(IStrategy):
                     if current_profit > dca_percent:
                         return None
 
-                    if last_candle['rsi'] > self.dca_rsi:
-                        return None
+                    # if last_candle['rsi'] > self.dca_rsi:
+                    #     return None
 
                     if last_candle['close'] < previous_candle['close']:
                         return None
@@ -200,40 +200,36 @@ class DcaBasedStrategy(IStrategy):
     #        return -0.10
     #    return 1
 
-    # def confirm_buy_higher_frame(self, pair, dataframe):
-    #     try:
-    #         higher_dataframe = self.dp.get_pair_dataframe(pair=pair, timeframe=self.higher_timeframe)
-    #         nums = [-1, -2]
-    #         hist_candles_actual = {}
-    #         hist_candles_higher = {}
-    #
-    #         for i in nums:
-    #             try:
-    #                 hist_candles_actual[i] = dataframe.iloc[i].squeeze()
-    #                 hist_candles_higher[i] = higher_dataframe.iloc[i].squeeze()
-    #             except:
-    #                 exc_type, exc_obj, exc_tb = sys.exc_info()
-    #                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-    #                 print('{} - {} - {}'.format(exc_type, fname, exc_tb.tb_lineno))
-    #
-    #         # open(f'user_data/logs/Candles_{pair.split("/")[0]}_{datetime.datetime.now()}.json', mode='a').write(
-    #         #     json.dumps(hist_candles))
-    #
-    #         try:
-    #             r = hist_candles_actual[-1]['sma9'] > hist_candles_actual[-2]['sma9'] and hist_candles_actual[-1][
-    #                 'sma9'] > hist_candles_actual[-1]['sma20'] > hist_candles_actual[-2]['sma20']
-    #             return r
-    #         except:
-    #             pass
-    #
-    #         return False
-    #
-    #     except:
-    #         exc_type, exc_obj, exc_tb = sys.exc_info()
-    #         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-    #         print('{} - {} - {}'.format(exc_type, fname, exc_tb.tb_lineno))
-    #         pass
-    #     return False
+    def confirm_buy_higher_frame(self, pair, dataframe):
+        try:
+            higher_dataframe = self.dp.get_pair_dataframe(pair=pair, timeframe=self.higher_timeframe)
+            nums = [-1, -2]
+            hist_candles_actual = {}
+            hist_candles_higher = {}
+
+            for i in nums:
+                try:
+                    hist_candles_actual[i] = dataframe.iloc[i].squeeze()
+                    hist_candles_higher[i] = higher_dataframe.iloc[i].squeeze()
+                except:
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                    print('{} - {} - {}'.format(exc_type, fname, exc_tb.tb_lineno))
+
+            try:
+                r = hist_candles_actual[-1]['sma9'] > hist_candles_actual[-2]['sma9'] \
+                    and hist_candles_actual[-1]['sma9'] > hist_candles_actual[-1]['sma20'] > hist_candles_actual[-2]['sma20']
+                return r
+            except:
+                pass
+            return False
+
+        except:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print('{} - {} - {}'.format(exc_type, fname, exc_tb.tb_lineno))
+            pass
+        return False
 
     def obtain_last_prev_candles(self, pair, timeframe):
         try:
@@ -320,52 +316,44 @@ class DcaBasedStrategy(IStrategy):
         return informative_pairs
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
-        # actual_dataframe = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe=self.timeframe)
         higher_dataframe = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe=self.higher_timeframe)
-        # self.get_recommendation(dataframe, metadata['pair'].replace('/', ''))
-
-        # dataframe[f'close_{self.timeframe}'] = actual_dataframe['close']
-        # dataframe[f'close_{self.higher_timeframe}'] = higher_dataframe['close']
-
         dataframe['adx'] = ta.ADX(dataframe, timeperiod=14)
-        # dataframe['sar'] = ta.SAR(dataframe)
-        # dataframe['tema'] = ta.TEMA(dataframe, timeperiod=9)
+        dataframe['sar'] = ta.SAR(dataframe)
+        dataframe['tema'] = ta.TEMA(dataframe, timeperiod=9)
         dataframe['sma9'] = ta.SMA(dataframe, timeperiod=9)
         dataframe['sma20'] = ta.SMA(dataframe, timeperiod=20)
         dataframe[f'sma9_{self.higher_timeframe}'] = ta.SMA(higher_dataframe, timeperiod=9)
         dataframe[f'sma20_{self.higher_timeframe}'] = ta.SMA(higher_dataframe, timeperiod=20)
-        # dataframe['hour'] = dataframe['date'].dt.hour
+        dataframe['hour'] = dataframe['date'].dt.hour
         dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
         dataframe['ema_fast'] = ta.EMA(dataframe, timeperiod=23)
         dataframe['ema_slow'] = ta.EMA(dataframe, timeperiod=50)
-        # bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-        # dataframe['bollinger_20_upperband'] = bollinger['upper']
-        # dataframe['bollinger_20_lowerband'] = bollinger['lower']
-        # dataframe['ema_fast_slow_pct'] = dataframe['ema_fast'] / dataframe['ema_slow'] * 100
-
+        bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
+        dataframe['bollinger_20_upperband'] = bollinger['upper']
+        dataframe['bollinger_20_lowerband'] = bollinger['lower']
+        dataframe['ema_fast_slow_pct'] = dataframe['ema_fast'] / dataframe['ema_slow'] * 100
         return dataframe
 
     def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        if self.dca_debug:
+        if not self.dca_debug:
             dataframe.loc[
                 (
-                        (dataframe['volume'].gt(0))
-                        # &
-                        # (dataframe['sma9'] > dataframe['sma20']) &
-                        # (dataframe[f'sma9_{self.higher_timeframe}'] > dataframe[f'sma20_{self.higher_timeframe}']) &
-                        # (dataframe['rsi'] >= self.buy_rsi_min) &
-                        # (dataframe['rsi'] <= self.buy_rsi_max)
+                        (dataframe['volume'].gt(0)) &
+                        (qtpylib.crossed_above(dataframe['sma9'],dataframe['sma20'])) &
+                        (qtpylib.crossed_above(dataframe[f'sma9_{self.higher_timeframe}'],dataframe[f'sma20_{self.higher_timeframe}'])) &
+                        (dataframe['rsi'] >= self.buy_rsi_min) &
+                        (dataframe['rsi'] <= self.buy_rsi_max)
                 ),
                 'buy'] = 1
         else:
             dataframe.loc[
                 (
-                        (dataframe['volume'].gt(0)) &
-                        (dataframe['sma9'] > dataframe['sma20']) &
-                        (dataframe[f'sma9_{self.higher_timeframe}'] > dataframe[f'sma20_{self.higher_timeframe}']) &
-                        (dataframe['rsi'] >= self.buy_rsi_min) &
-                        (dataframe['rsi'] <= self.buy_rsi_max)
+                    (dataframe['volume'].gt(0))
+                    # &
+                    # (dataframe['sma9'] > dataframe['sma20']) &
+                    # (dataframe[f'sma9_{self.higher_timeframe}'] > dataframe[f'sma20_{self.higher_timeframe}']) &
+                    # (dataframe['rsi'] >= self.buy_rsi_min) &
+                    # (dataframe['rsi'] <= self.buy_rsi_max)
                 ),
                 'buy'] = 1
         return dataframe
