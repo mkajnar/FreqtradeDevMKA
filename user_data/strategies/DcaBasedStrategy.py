@@ -25,13 +25,13 @@ class DcaBasedStrategy(IStrategy):
         super().__init__(config)
         self.dca_rsi = 40
         self.buy_rsi_min = 20
-        self.buy_rsi_max = 60
+        self.buy_rsi_max = 55
         self.timeframe = '1m'
         self.informative_timeframes = ['15m']
         self.higher_timeframe = '15m'
         # jen debug
         self.dca_debug = False
-        self.dca_wait_secs = 10 * 60
+        self.dca_wait_secs = 5 * 60
         # self.dca_wait_secs = 300
         # self.minimal_roi = {
         #                       "0": 0.003
@@ -57,7 +57,7 @@ class DcaBasedStrategy(IStrategy):
         self.load_dca_orders()
 
         self.unfilledtimeout = {
-            'buy': 60 * 5,
+            'buy': 60 * 3,
             'sell': 60 * 10
         }
         self.order_types = {
@@ -152,8 +152,8 @@ class DcaBasedStrategy(IStrategy):
                     if current_profit > dca_percent:
                         return None
 
-                    # if last_candle['rsi'] > self.dca_rsi:
-                    #     return None
+                    if last_candle['rsi'] > self.dca_rsi:
+                        return None
 
                     if last_candle['close'] < previous_candle['close']:
                         return None
@@ -300,7 +300,7 @@ class DcaBasedStrategy(IStrategy):
 
     def block_pair(self, pair, sell_reason):
         try:
-            _block_year = datetime.datetime.now() + timedelta(days=365)
+            _block_year = datetime.datetime.now() + timedelta(minutes=15)
             self.lock_pair(pair=pair, until=_block_year, reason=sell_reason)
         except:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -339,8 +339,8 @@ class DcaBasedStrategy(IStrategy):
             dataframe.loc[
                 (
                         (dataframe['volume'].gt(0)) &
-                        (qtpylib.crossed_above(dataframe['sma9'],dataframe['sma20'])) &
-                        (qtpylib.crossed_above(dataframe[f'sma9_{self.higher_timeframe}'],dataframe[f'sma20_{self.higher_timeframe}'])) &
+                        # (qtpylib.crossed_above(dataframe['sma9'],dataframe['sma20'])) &
+                        # (qtpylib.crossed_above(dataframe[f'sma9_{self.higher_timeframe}'],dataframe[f'sma20_{self.higher_timeframe}'])) &
                         (dataframe['rsi'] >= self.buy_rsi_min) &
                         (dataframe['rsi'] <= self.buy_rsi_max)
                 ),
