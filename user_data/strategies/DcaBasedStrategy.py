@@ -23,9 +23,10 @@ class DcaBasedStrategy(IStrategy):
 
     def __init__(self, config: dict):
         super().__init__(config)
+        self.min_max_list = {}
         self.dca_rsi = 40
-        self.buy_rsi_min = 20
-        self.buy_rsi_max = 55
+        # self.buy_rsi_min = 20
+        # self.buy_rsi_max = 55
         self.timeframe = '1m'
         self.informative_timeframes = ['15m']
         self.higher_timeframe = '15m'
@@ -39,7 +40,7 @@ class DcaBasedStrategy(IStrategy):
         self.minimal_roi = get_rois()
 
         self.stoploss = stoploss
-        #self.use_custom_stoploss = True
+        # self.use_custom_stoploss = True
         self.use_sell_signal = use_sell_signal
         self.trailing_stop = trailing_stop
         self.trailing_stop_positive = trailing_stop_positive
@@ -47,8 +48,8 @@ class DcaBasedStrategy(IStrategy):
         self.trailing_only_offset_is_reached = trailing_only_offset_is_reached
         self.stop_buy = IntParameter(0, 1, default=1, space='buy')
         self.position_adjustment_enable = True
-        self.max_dca_orders = 5
-        self.max_dca_multiplier = 9.75
+        self.max_dca_orders = 3
+        self.max_dca_multiplier = 5.5
         self.dca_koef = 0.25
         self.dca_orders = {}
         self.profits = {}
@@ -67,7 +68,7 @@ class DcaBasedStrategy(IStrategy):
             'stoploss_on_exchange': False
         }
         self.plot_config = {
-            "main_plot": {
+            "_main_plot": {
                 "tema": {},
                 "sar": {
                     "color": "white"
@@ -152,8 +153,8 @@ class DcaBasedStrategy(IStrategy):
                     if current_profit > dca_percent:
                         return None
 
-                    if last_candle['rsi'] > self.dca_rsi:
-                        return None
+                    # if last_candle['rsi'] > self.dca_rsi:
+                    #     return None
 
                     if last_candle['close'] < previous_candle['close']:
                         return None
@@ -218,7 +219,8 @@ class DcaBasedStrategy(IStrategy):
 
             try:
                 r = hist_candles_actual[-1]['sma9'] > hist_candles_actual[-2]['sma9'] \
-                    and hist_candles_actual[-1]['sma9'] > hist_candles_actual[-1]['sma20'] > hist_candles_actual[-2]['sma20']
+                    and hist_candles_actual[-1]['sma9'] > hist_candles_actual[-1]['sma20'] > hist_candles_actual[-2][
+                        'sma20']
                 return r
             except:
                 pass
@@ -281,14 +283,14 @@ class DcaBasedStrategy(IStrategy):
                            rate: float, time_in_force: str, sell_reason: str, **kwargs) -> bool:
         try:
             if 'stop_loss' == sell_reason:
-                self.block_pair(pair=pair,sell_reason=sell_reason)
+                self.block_pair(pair=pair, sell_reason=sell_reason)
                 return True
             if 'force_exit' == sell_reason:
                 self.block_pair(pair=pair, sell_reason=sell_reason)
                 return True
-            #other
+            # other
             pr = trade.calc_profit_ratio(rate)
-            if pr <= 0:
+            if pr < 0.02:
                 return False
         except:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -316,53 +318,39 @@ class DcaBasedStrategy(IStrategy):
         return informative_pairs
 
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        higher_dataframe = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe=self.higher_timeframe)
-        dataframe['adx'] = ta.ADX(dataframe, timeperiod=14)
-        dataframe['sar'] = ta.SAR(dataframe)
-        dataframe['tema'] = ta.TEMA(dataframe, timeperiod=9)
-        dataframe['sma9'] = ta.SMA(dataframe, timeperiod=9)
-        dataframe['sma20'] = ta.SMA(dataframe, timeperiod=20)
-        dataframe[f'sma9_{self.higher_timeframe}'] = ta.SMA(higher_dataframe, timeperiod=9)
-        dataframe[f'sma20_{self.higher_timeframe}'] = ta.SMA(higher_dataframe, timeperiod=20)
-        dataframe['hour'] = dataframe['date'].dt.hour
+        # higher_dataframe = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe=self.higher_timeframe)
+        # dataframe['adx'] = ta.ADX(dataframe, timeperiod=14)
+        # dataframe['sar'] = ta.SAR(dataframe)
+        # dataframe['tema'] = ta.TEMA(dataframe, timeperiod=9)
+        # dataframe['sma9'] = ta.SMA(dataframe, timeperiod=9)
+        # dataframe['sma20'] = ta.SMA(dataframe, timeperiod=20)
+        # dataframe[f'sma9_{self.higher_timeframe}'] = ta.SMA(higher_dataframe, timeperiod=9)
+        # dataframe[f'sma20_{self.higher_timeframe}'] = ta.SMA(higher_dataframe, timeperiod=20)
+        # dataframe['hour'] = dataframe['date'].dt.hour
+        # dataframe['ema_fast'] = ta.EMA(dataframe, timeperiod=23)
+        # dataframe['ema_slow'] = ta.EMA(dataframe, timeperiod=50)
+        # bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
+        # dataframe['bollinger_20_upperband'] = bollinger['upper']
+        # dataframe['bollinger_20_lowerband'] = bollinger['lower']
+        # dataframe['ema_fast_slow_pct'] = dataframe['ema_fast'] / dataframe['ema_slow'] * 100
         dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
-        dataframe['ema_fast'] = ta.EMA(dataframe, timeperiod=23)
-        dataframe['ema_slow'] = ta.EMA(dataframe, timeperiod=50)
-        bollinger = qtpylib.bollinger_bands(qtpylib.typical_price(dataframe), window=20, stds=2)
-        dataframe['bollinger_20_upperband'] = bollinger['upper']
-        dataframe['bollinger_20_lowerband'] = bollinger['lower']
-        dataframe['ema_fast_slow_pct'] = dataframe['ema_fast'] / dataframe['ema_slow'] * 100
+        self.min_max_list[metadata['pair']] = [dataframe['rsi'].min(), dataframe['rsi'].max()]
         return dataframe
 
     def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        if not self.dca_debug:
-            dataframe.loc[
-                (
-                        (dataframe['volume'].gt(0)) &
-                        # (qtpylib.crossed_above(dataframe['sma9'],dataframe['sma20'])) &
-                        # (qtpylib.crossed_above(dataframe[f'sma9_{self.higher_timeframe}'],dataframe[f'sma20_{self.higher_timeframe}'])) &
-                        (dataframe['rsi'] >= self.buy_rsi_min) &
-                        (dataframe['rsi'] <= self.buy_rsi_max)
-                ),
-                'buy'] = 1
-        else:
-            dataframe.loc[
-                (
-                    (dataframe['volume'].gt(0))
-                    # &
-                    # (dataframe['sma9'] > dataframe['sma20']) &
-                    # (dataframe[f'sma9_{self.higher_timeframe}'] > dataframe[f'sma20_{self.higher_timeframe}']) &
-                    # (dataframe['rsi'] >= self.buy_rsi_min) &
-                    # (dataframe['rsi'] <= self.buy_rsi_max)
-                ),
-                'buy'] = 1
+        dataframe.loc[
+            (
+                    (dataframe['volume'].gt(0)) &
+                    (dataframe['rsi'] <= self.min_max_list[metadata['pair']][0] + 10)
+            ),
+            'buy'] = 1
         return dataframe
 
     def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         dataframe.loc[
             (
-                    (dataframe['rsi'] >= 100) &
-                    (dataframe['volume'].gt(0))
+                    (dataframe['volume'].gt(0)) &
+                    (dataframe['rsi'] >= self.min_max_list[metadata['pair']][1] - 5)
             ),
             'sell'] = 1
         return dataframe

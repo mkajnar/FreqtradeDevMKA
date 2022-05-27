@@ -1,1 +1,1 @@
-dca_percent = -0.0035
+dca_percent = -0.02

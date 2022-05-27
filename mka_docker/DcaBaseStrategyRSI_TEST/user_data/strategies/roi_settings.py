@@ -1,9 +1,11 @@
 def get_rois():
     return {
-        "40": 0.0,  # Exit after 40 minutes if the profit is not negative
-        "30": 0.01,  # Exit after 30 minutes if there is at least 1% profit
-        "20": 0.02,  # Exit after 20 minutes if there is at least 2% profit
-        "0": 0.04  # Exit immediately if there is at least 4% profit
+        "60": 0.00,
+        "50": 0.01,
+        "40": 0.02,
+        "30": 0.04,
+        "20": 0.08,
+        "0": 0.10
     }
 
     # roi_prefs = {}
