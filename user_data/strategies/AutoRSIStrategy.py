@@ -29,15 +29,15 @@ class AutoRSIStrategy(IStrategy):
         super().__init__(config)
         self.min_max_list = {}
         self.histograms = defaultdict(object)
-        self.higher_histograms = defaultdict(object)
+        # self.higher_histograms = defaultdict(object)
         self.btc_rsi_hist = []
-        self.btc_rsi_hist_higher = []
+        # self.btc_rsi_hist_higher = []
         self.rsi_min = {}
         self.rsi_max = {}
         self.reason = {}
         self.timeframe = '1m'
-        self.informative_timeframes = ['3m']
-        self.higher_timeframe = '3m'
+        # self.informative_timeframes = ['3m']
+        # self.higher_timeframe = '3m'
         self.minimal_roi = get_rois()
         self.stoploss = stoploss
         self.use_sell_signal = use_sell_signal
@@ -94,8 +94,8 @@ class AutoRSIStrategy(IStrategy):
     # This is called when placing the initial order (opening trade)
     @safe
     def custom_stake_amount(self, pair: str, current_time: datetime, current_rate: float,
-                            proposed_stake: float, min_stake: float, max_stake: float,
-                            **kwargs) -> float:
+                            proposed_stake: float, min_stake: Optional[float], max_stake: float,
+                            entry_tag: Optional[str], side: str, **kwargs) -> float:
         # We need to leave most of the funds for possible further DCA orders
         # This also applies to fixed stakes
         return proposed_stake / self.max_dca_multiplier
@@ -223,20 +223,20 @@ class AutoRSIStrategy(IStrategy):
         with open(f'user_data/dca_orders_{self.dca_rsi}', 'wb') as handle:
             pickle.dump(self.dca_orders, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    @safe
-    def informative_pairs(self):
-        pairs = self.dp.current_whitelist()
-        informative_pairs = []
-        for _ in self.informative_timeframes:
-            informative_pairs.extend([(pair, _) for pair in pairs])
-        return informative_pairs
+    # @safe
+    # def informative_pairs(self):
+    #     pairs = self.dp.current_whitelist()
+    #     informative_pairs = []
+    #     for _ in self.informative_timeframes:
+    #         informative_pairs.extend([(pair, _) for pair in pairs])
+    #     return informative_pairs
 
     @safe
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        higher_dataframe = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe=self.higher_timeframe)
+        # higher_dataframe = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe=self.higher_timeframe)
 
         dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
-        higher_dataframe['rsi'] = ta.RSI(higher_dataframe, timeperiod=14)
+        # higher_dataframe['rsi'] = ta.RSI(higher_dataframe, timeperiod=14)
         # find min a max RSI values by quantile +/- 1%
         self.min_max_list[metadata['pair']] = [dataframe['rsi'].quantile(0.01), dataframe['rsi'].quantile(0.99)]
 
@@ -248,19 +248,19 @@ class AutoRSIStrategy(IStrategy):
             print(
                 f'\t\t\tBTC BUY/SELL: {(self.btc_rsi_hist[-1][0] + self.btc_rsi_hist[-1][1]) / 2}\n')
 
-            self.btc_rsi_hist_higher.append(
-                [higher_dataframe['rsi'].values[-1], higher_dataframe['rsi'].median(), higher_dataframe['rsi'].mean(),
-                 higher_dataframe['rsi'].mode()[0]])
-            print(
-                f'\n\t\t\tBTC STATS - HIGHER:\tRSI {self.btc_rsi_hist_higher[-1][0]}, MEDIAN {self.btc_rsi_hist_higher[-1][1]}, MEAN {self.btc_rsi_hist_higher[-1][2]}, MODE {self.btc_rsi_hist_higher[-1][3]}')
-            print(
-                f'\t\t\tBTC BUY/SELL - HIGHER: {(self.btc_rsi_hist_higher[-1][0] + self.btc_rsi_hist_higher[-1][1]) / 2}\n')
+            # self.btc_rsi_hist_higher.append(
+            #     [higher_dataframe['rsi'].values[-1], higher_dataframe['rsi'].median(), higher_dataframe['rsi'].mean(),
+            #      higher_dataframe['rsi'].mode()[0]])
+            # print(
+            #     f'\n\t\t\tBTC STATS - HIGHER:\tRSI {self.btc_rsi_hist_higher[-1][0]}, MEDIAN {self.btc_rsi_hist_higher[-1][1]}, MEAN {self.btc_rsi_hist_higher[-1][2]}, MODE {self.btc_rsi_hist_higher[-1][3]}')
+            # print(
+            #     f'\t\t\tBTC BUY/SELL - HIGHER: {(self.btc_rsi_hist_higher[-1][0] + self.btc_rsi_hist_higher[-1][1]) / 2}\n')
 
         self.histograms[metadata['pair']] = histogram(dataframe['rsi'].values)
-        self.higher_histograms[metadata['pair']] = histogram(higher_dataframe['rsi'].values)
+        # self.higher_histograms[metadata['pair']] = histogram(higher_dataframe['rsi'].values)
 
         print(f"Normal RSI histogram for {metadata['pair']}: {json.dumps(histogram(dataframe['rsi'].values))}")
-        print(f"Higher RSI histogram for {metadata['pair']}: {json.dumps(histogram(higher_dataframe['rsi'].values))}")
+        # print(f"Higher RSI histogram for {metadata['pair']}: {json.dumps(histogram(higher_dataframe['rsi'].values))}")
 
         return dataframe
 
@@ -315,8 +315,8 @@ class AutoRSIStrategy(IStrategy):
             (
                     (dataframe['volume'].gt(0)) &
                     (dataframe['rsi'].gt(self.rsi_min[metadata['pair']][0])) &
-                    (dataframe['rsi'].lt(self.rsi_min[metadata['pair']][1])) &
-                    (btc_buy == 1)
+                    (dataframe['rsi'].lt(self.rsi_min[metadata['pair']][1]))
+                    # & (btc_buy == 1)
             ),
             ['enter_long', 'enter_tag']] = (1, self.reason[metadata['pair']])
         return dataframe
