@@ -288,7 +288,7 @@ class AutoRSIStrategy(IStrategy):
             if pr > 0:
                 return True
 
-        if 'sell_signal_rsi' == sell_reason:
+        if 'exit_signal' == sell_reason:
             if pr > 0:
                 return True
 
@@ -300,7 +300,7 @@ class AutoRSIStrategy(IStrategy):
         self.lock_pair(pair=pair, until=_block_year, reason=sell_reason)
 
     @safe
-    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         btc_buy = 0
         if (self.btc_rsi_hist[-1][0] + self.btc_rsi_hist[-1][1]) / 2 >= 50.0:
             #and ((self.btc_rsi_hist_higher[-1][0] + self.btc_rsi_hist_higher[-1][1]) / 2 >= 50.0):
@@ -318,11 +318,12 @@ class AutoRSIStrategy(IStrategy):
                     (dataframe['rsi'].lt(self.rsi_min[metadata['pair']][1]))
                     # & (btc_buy == 1)
             ),
-            ['enter_long', 'enter_tag']] = (1, self.reason[metadata['pair']])
+            # ['enter_long', 'enter_tag']] = (1, self.reason[metadata['pair']])
+            'buy'] = 1
         return dataframe
 
     @safe
-    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         # btc_sell = 0
         # if ((self.btc_rsi_hist[-1][0] + self.btc_rsi_hist[-1][1]) / 2 <= 50.0) \
         #         and ((self.btc_rsi_hist[-1][0] + self.btc_rsi_hist[-1][1]) / 2 <= 50.0):
@@ -342,5 +343,6 @@ class AutoRSIStrategy(IStrategy):
                     (dataframe['rsi'].lt(self.rsi_max[metadata['pair']][1]))
                     #| (btc_sell == 1)
             ),
-            ['exit_long', 'exit_tag']] = (1, self.reason[metadata['pair']])
+            # ['exit_long', 'exit_tag']] = (1, self.reason[metadata['pair']])
+            'sell'] = 1
         return dataframe
