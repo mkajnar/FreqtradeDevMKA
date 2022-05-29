@@ -282,15 +282,23 @@ class DcaBasedStrategy(IStrategy):
     def confirm_trade_exit(self, pair: str, trade: Trade, order_type: str, amount: float,
                            rate: float, time_in_force: str, sell_reason: str, **kwargs) -> bool:
         try:
+            pr = trade.calc_profit_ratio(rate)
             if 'stop_loss' == sell_reason:
-                self.block_pair(pair=pair, sell_reason=sell_reason)
+                self.block_pair(pair=pair, sell_reason=sell_reason, minutes=10)
                 return True
             if 'force_exit' == sell_reason:
-                self.block_pair(pair=pair, sell_reason=sell_reason)
+                self.block_pair(pair=pair, sell_reason=sell_reason, minutes=60)
+                return True
+            if 'exit_signal' == sell_reason:
+                if pr < 0:
+                    return False
+                self.block_pair(pair=pair, sell_reason=sell_reason, minutes=3)
+                return True
+            if 'trailing_stop_loss' == sell_reason:
+                self.block_pair(pair=pair, sell_reason=sell_reason, minutes=3)
                 return True
             # other
-            pr = trade.calc_profit_ratio(rate)
-            if pr < 0.02:
+            if pr < 0.10:
                 return False
         except:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -300,9 +308,9 @@ class DcaBasedStrategy(IStrategy):
 
         return True
 
-    def block_pair(self, pair, sell_reason):
+    def block_pair(self, pair, sell_reason, minutes):
         try:
-            _block_year = datetime.datetime.now() + timedelta(minutes=15)
+            _block_year = datetime.datetime.now() + timedelta(minutes=minutes)
             self.lock_pair(pair=pair, until=_block_year, reason=sell_reason)
         except:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -341,7 +349,7 @@ class DcaBasedStrategy(IStrategy):
         dataframe.loc[
             (
                     (dataframe['volume'].gt(0)) &
-                    (dataframe['rsi'] <= self.min_max_list[metadata['pair']][0] + 10)
+                    (dataframe['rsi'] <= self.min_max_list[metadata['pair']][0] + 5)
             ),
             'buy'] = 1
         return dataframe
