@@ -29,15 +29,13 @@ class AutoRSIStrategy(IStrategy):
         super().__init__(config)
         self.min_max_list = {}
         self.histograms = defaultdict(object)
-        # self.higher_histograms = defaultdict(object)
         self.btc_rsi_hist = []
-        # self.btc_rsi_hist_higher = []
         self.rsi_min = {}
         self.rsi_max = {}
         self.reason = {}
         self.timeframe = '1m'
-        # self.informative_timeframes = ['3m']
-        # self.higher_timeframe = '3m'
+        self.informative_timeframes = ['3m']
+        self.higher_timeframe = '3m'
         self.minimal_roi = get_rois()
         self.stoploss = stoploss
         self.use_sell_signal = use_sell_signal
@@ -56,6 +54,8 @@ class AutoRSIStrategy(IStrategy):
         self.dca_orders = {}
         self.profits = {}
         #end dca section
+
+        self.initial_buys = {}
 
         self.unfilledtimeout = {
             'buy': 60 * 3,
@@ -154,8 +154,8 @@ class AutoRSIStrategy(IStrategy):
                     if current_profit > dca_percent:
                         return None
 
-                    if last_candle['rsi'] > self.dca_rsi:
-                        return None
+                    # if last_candle['rsi'] > self.dca_rsi:
+                    #     return None
 
                     if last_candle['close'] < previous_candle['close']:
                         return None
@@ -223,13 +223,13 @@ class AutoRSIStrategy(IStrategy):
         with open(f'user_data/dca_orders_{self.dca_rsi}', 'wb') as handle:
             pickle.dump(self.dca_orders, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-    # @safe
-    # def informative_pairs(self):
-    #     pairs = self.dp.current_whitelist()
-    #     informative_pairs = []
-    #     for _ in self.informative_timeframes:
-    #         informative_pairs.extend([(pair, _) for pair in pairs])
-    #     return informative_pairs
+    @safe
+    def informative_pairs(self):
+        pairs = self.dp.current_whitelist()
+        informative_pairs = []
+        for _ in self.informative_timeframes:
+            informative_pairs.extend([(pair, _) for pair in pairs])
+        return informative_pairs
 
     @safe
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
@@ -270,7 +270,7 @@ class AutoRSIStrategy(IStrategy):
         pr = trade.calc_profit_ratio(rate)
 
         if 'stop_loss' == sell_reason:
-            self.block_pair(pair=pair, sell_reason=sell_reason, minutes=10)
+            self.block_pair(pair=pair, sell_reason=sell_reason, minutes=24*60)
             return True
 
         if 'force_exit' == sell_reason:
@@ -292,6 +292,9 @@ class AutoRSIStrategy(IStrategy):
             if pr > 0:
                 return True
 
+        if 'roi' == sell_reason:
+            return True
+
         return False
 
     @safe
@@ -300,49 +303,41 @@ class AutoRSIStrategy(IStrategy):
         self.lock_pair(pair=pair, until=_block_year, reason=sell_reason)
 
     @safe
+    def flip_initial_buy(self, pair):
+        result = self.initial_buys[pair]
+        self.initial_buys[pair] = 0
+        return result
+
+    @safe
     def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        btc_buy = 0
-        if (self.btc_rsi_hist[-1][0] + self.btc_rsi_hist[-1][1]) / 2 >= 50.0:
-            #and ((self.btc_rsi_hist_higher[-1][0] + self.btc_rsi_hist_higher[-1][1]) / 2 >= 50.0):
-            btc_buy = 1
+
+        if metadata['pair'] not in self.initial_buys.keys():
+            self.initial_buys[metadata['pair']] = 1
 
         self.rsi_min[metadata['pair']] = [[int(x) for x in s[0].split('-')]
-                                          for s in self.histograms[metadata['pair']] if s[1] > 10][0]
-
+                                          for s in self.histograms[metadata['pair']] if s[1] > 15][0]
         self.reason[metadata['pair']] = 'buy_signal_rsi'
-
         dataframe.loc[
             (
                     (dataframe['volume'].gt(0)) &
                     (dataframe['rsi'].gt(self.rsi_min[metadata['pair']][0])) &
-                    (dataframe['rsi'].lt(self.rsi_min[metadata['pair']][1]))
-                    # & (btc_buy == 1)
+                    (dataframe['rsi'].lt(self.rsi_min[metadata['pair']][1])) |
+                    (self.flip_initial_buy(metadata['pair']) == 1)
             ),
-            # ['enter_long', 'enter_tag']] = (1, self.reason[metadata['pair']])
             'buy'] = 1
         return dataframe
 
     @safe
     def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        # btc_sell = 0
-        # if ((self.btc_rsi_hist[-1][0] + self.btc_rsi_hist[-1][1]) / 2 <= 50.0) \
-        #         and ((self.btc_rsi_hist[-1][0] + self.btc_rsi_hist[-1][1]) / 2 <= 50.0):
-        #     btc_sell = 1
-
         self.rsi_max[metadata['pair']] = [[int(x) for x in s[0].split('-')]
-                                          for s in self.histograms[metadata['pair']] if s[1] > 10][-1]
+                                          for s in self.histograms[metadata['pair']] if s[1] > 15][-1]
 
         self.reason[metadata['pair']] = 'sell_signal_rsi'
-        # if btc_sell == 1:
-        #     self.reason[metadata['pair']] = 'sell_signal_btc_down'
-
         dataframe.loc[
             (
                     (dataframe['volume'].gt(0)) &
                     (dataframe['rsi'].gt(self.rsi_max[metadata['pair']][0])) &
                     (dataframe['rsi'].lt(self.rsi_max[metadata['pair']][1]))
-                    #| (btc_sell == 1)
             ),
-            # ['exit_long', 'exit_tag']] = (1, self.reason[metadata['pair']])
             'sell'] = 1
         return dataframe
