@@ -208,13 +208,13 @@ class AutoRSIStrategy(IStrategy):
 
     @safe
     def load_dca_orders(self):
-        if os.path.exists(f'user_data/dca_orders_{self.dca_rsi}'):
-            with open(f'user_data/dca_orders_{self.dca_rsi}', 'rb') as handle:
+        if os.path.exists(f'user_data/dca_orders_{self.dca_rsi}_{self.get_strategy_name()}'):
+            with open(f'user_data/dca_orders_{self.dca_rsi}_{self.get_strategy_name()}', 'rb') as handle:
                 self.dca_orders = pickle.load(handle)
 
     @safe
     def save_dca_orders(self):
-        with open(f'user_data/dca_orders_{self.dca_rsi}_history', 'a') as f:
+        with open(f'user_data/dca_orders_{self.dca_rsi}_history_{self.get_strategy_name()}', 'a') as f:
             for k in self.dca_orders.keys():
                 if not self.dca_orders[k]["saved"]:
                     f.write(
@@ -223,7 +223,7 @@ class AutoRSIStrategy(IStrategy):
                     self.dca_orders[k]["saved"] = True
             f.close()
 
-        with open(f'user_data/dca_orders_{self.dca_rsi}', 'wb') as handle:
+        with open(f'user_data/dca_orders_{self.dca_rsi}_{self.get_strategy_name()}', 'wb') as handle:
             pickle.dump(self.dca_orders, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     @safe

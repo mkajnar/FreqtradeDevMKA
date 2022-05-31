@@ -3,8 +3,8 @@ def fill(buckets, _from, _to, _l):
     pass
 
 def histogram(s):
-    l = s.tolist()[-200:]
+    l = s.tolist()[-500:]
     buckets = {}
-    for i in range(0,100,5):
+    for i in range(0,100,1):
         fill(buckets,i,i+5,l)
     return [(k,len(buckets[k])) for k in buckets.keys()]
