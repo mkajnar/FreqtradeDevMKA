@@ -151,11 +151,14 @@ class AutoRSIStrategy(IStrategy):
 
                 if not self.dca_debug:
 
-                    if current_profit > dca_percent:
-                        return None
-
-                    # if last_candle['rsi'] > self.dca_rsi:
+                    # if current_profit > dca_percent:
                     #     return None
+
+                    # if  last_candle['rsi'] < self.rsi_min[trade.pair][0]:
+                    #     return None
+
+                    if  last_candle['rsi'] > self.rsi_min[trade.pair][1]:
+                        return None
 
                     if last_candle['close'] < previous_candle['close']:
                         return None
@@ -315,14 +318,14 @@ class AutoRSIStrategy(IStrategy):
             self.initial_buys[metadata['pair']] = 1
 
         self.rsi_min[metadata['pair']] = [[int(x) for x in s[0].split('-')]
-                                          for s in self.histograms[metadata['pair']] if s[1] > 15][0]
+                                          for s in self.histograms[metadata['pair']] if s[1] >= 3][0]
         self.reason[metadata['pair']] = 'buy_signal_rsi'
         dataframe.loc[
             (
-                    (dataframe['volume'].gt(0)) &
-                    (dataframe['rsi'].gt(self.rsi_min[metadata['pair']][0])) &
-                    (dataframe['rsi'].lt(self.rsi_min[metadata['pair']][1])) |
-                    (self.flip_initial_buy(metadata['pair']) == 1)
+                ((dataframe['volume'].gt(0)) &
+                # (dataframe['rsi'].gt(self.rsi_min[metadata['pair']][0])) &
+                (dataframe['rsi'].lt(self.rsi_min[metadata['pair']][1]))) |
+                (self.flip_initial_buy(metadata['pair']) == 1)
             ),
             'buy'] = 1
         return dataframe
@@ -330,14 +333,14 @@ class AutoRSIStrategy(IStrategy):
     @safe
     def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         self.rsi_max[metadata['pair']] = [[int(x) for x in s[0].split('-')]
-                                          for s in self.histograms[metadata['pair']] if s[1] > 15][-1]
+                                          for s in self.histograms[metadata['pair']] if s[1] >= 3][-1]
 
         self.reason[metadata['pair']] = 'sell_signal_rsi'
         dataframe.loc[
             (
                     (dataframe['volume'].gt(0)) &
-                    (dataframe['rsi'].gt(self.rsi_max[metadata['pair']][0])) &
-                    (dataframe['rsi'].lt(self.rsi_max[metadata['pair']][1]))
+                    (dataframe['rsi'].gt(self.rsi_max[metadata['pair']][0]))
+                    # & (dataframe['rsi'].lt(self.rsi_max[metadata['pair']][1]))
             ),
             'sell'] = 1
         return dataframe
