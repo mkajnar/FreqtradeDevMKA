@@ -43,17 +43,19 @@ class AutoRSIStrategy(IStrategy):
         self.trailing_stop_positive = trailing_stop_positive
         self.trailing_stop_positive_offset = trailing_stop_positive_offset
         self.trailing_only_offset_is_reached = trailing_only_offset_is_reached
-        #begin dca section
+        # begin dca section
         self.position_adjustment_enable = True
         self.dca_rsi = 40
+        self.dca_rsi_history = {}
+        self.dca_rsi_profit = {}
         self.dca_debug = False
         self.dca_wait_secs = 5 * 60
         self.max_dca_orders = 3
         self.max_dca_multiplier = 5.5
-        self.dca_koef = 0.25
+        self.dca_koef = 0.5
         self.dca_orders = {}
         self.profits = {}
-        #end dca section
+        # end dca section
 
         self.initial_buys = {}
 
@@ -137,28 +139,46 @@ class AutoRSIStrategy(IStrategy):
 
             if last_candle is not None and previous_candle is not None:
 
-                if trade.pair in self.dca_orders.keys():
-                    t = (datetime.datetime.now() - self.dca_orders[trade.pair]["changed"])
-                    if t.total_seconds() <= self.dca_wait_secs:
-                        return None
-                else:
-                    dca_item = {"current_rate": current_rate, "current_profit": current_profit,
-                                "stake_amount": filled_buys[0].cost, "changed": datetime.datetime.now(), "saved": False}
+                open(f'RSI_Profit_{trade.pair.replace("/", "_")}_{self.get_strategy_name()}_'
+                     f'{self.timeframe}.csv', mode='a').write(f'{current_time};'
+                                                              f'{trade.pair};'
+                                                              f'{current_profit};'
+                                                              f'{last_candle["rsi"]}\n')
 
-                    self.dca_orders[trade.pair] = dca_item
-                    self.save_dca_orders()
-                    return None
+                if trade.pair not in self.dca_rsi_history.keys():
+                    self.dca_rsi_history[trade.pair] = []
+                if trade.pair not in self.dca_rsi_profit.keys():
+                    self.dca_rsi_profit[trade.pair] = []
+
+                # if trade.pair in self.dca_orders.keys():
+                #     t = (datetime.datetime.now() - self.dca_orders[trade.pair]["changed"])
+                #     if t.total_seconds() <= self.dca_wait_secs:
+                #         return None
+                # else:
+                #     dca_item = {"current_rate": current_rate, "current_profit": current_profit,
+                #                 "stake_amount": filled_buys[0].cost, "changed": datetime.datetime.now(), "saved": False}
+                #
+                #     self.dca_orders[trade.pair] = dca_item
+                #     self.save_dca_orders()
+                #     return None
 
                 if not self.dca_debug:
 
-                    # if current_profit > dca_percent:
-                    #     return None
-
-                    # if  last_candle['rsi'] < self.rsi_min[trade.pair][0]:
-                    #     return None
-
-                    if  last_candle['rsi'] > self.rsi_min[trade.pair][1]:
+                    if current_profit >= dca_percent:
                         return None
+
+                    if len(self.dca_rsi_history[trade.pair]) > 0 \
+                            and last_candle['rsi'] <= self.dca_rsi_history[trade.pair][-1]:
+                        self.save_last_rsi(last_candle, trade)
+                        return None
+
+                    if len(self.dca_rsi_profit[trade.pair]) > 0 \
+                            and current_profit <= self.dca_rsi_profit[trade.pair][-1]:
+                        self.save_last_profit(current_profit, trade)
+                        return None
+
+                    self.save_last_rsi(last_candle, trade)
+                    self.save_last_profit(current_profit, trade)
 
                     if last_candle['close'] < previous_candle['close']:
                         return None
@@ -192,6 +212,14 @@ class AutoRSIStrategy(IStrategy):
             pass
 
         return None
+
+    def save_last_profit(self, current_profit, trade):
+        if current_profit not in self.dca_rsi_profit[trade.pair]:
+            self.dca_rsi_profit[trade.pair].append(current_profit)
+
+    def save_last_rsi(self, last_candle, trade):
+        if last_candle["rsi"] not in self.dca_rsi_history[trade.pair]:
+            self.dca_rsi_history[trade.pair].append(last_candle["rsi"])
 
     @safe
     def obtain_last_prev_candles(self, pair, timeframe):
@@ -273,7 +301,7 @@ class AutoRSIStrategy(IStrategy):
         pr = trade.calc_profit_ratio(rate)
 
         if 'stop_loss' == sell_reason:
-            self.block_pair(pair=pair, sell_reason=sell_reason, minutes=24*60)
+            self.block_pair(pair=pair, sell_reason=sell_reason, minutes=24 * 60)
             return True
 
         if 'force_exit' == sell_reason:
@@ -288,11 +316,11 @@ class AutoRSIStrategy(IStrategy):
 
         if 'trailing_stop_loss' == sell_reason:
             self.block_pair(pair=pair, sell_reason=sell_reason, minutes=3)
-            if pr > 0:
+            if pr > 0.01:
                 return True
 
         if 'exit_signal' == sell_reason:
-            if pr > 0:
+            if pr > 0.10:
                 return True
 
         if 'roi' == sell_reason:
@@ -318,14 +346,14 @@ class AutoRSIStrategy(IStrategy):
             self.initial_buys[metadata['pair']] = 1
 
         self.rsi_min[metadata['pair']] = [[int(x) for x in s[0].split('-')]
-                                          for s in self.histograms[metadata['pair']] if s[1] >= 3][0]
+                                          for s in self.histograms[metadata['pair']] if s[1] > 0][0]
         self.reason[metadata['pair']] = 'buy_signal_rsi'
         dataframe.loc[
             (
-                ((dataframe['volume'].gt(0)) &
-                # (dataframe['rsi'].gt(self.rsi_min[metadata['pair']][0])) &
-                (dataframe['rsi'].lt(self.rsi_min[metadata['pair']][1]))) |
-                (self.flip_initial_buy(metadata['pair']) == 1)
+                    ((dataframe['volume'].gt(0)) &
+                     # (dataframe['rsi'].gt(self.rsi_min[metadata['pair']][0])) &
+                     (dataframe['rsi'].lt(self.rsi_min[metadata['pair']][1]))) |
+                    (self.flip_initial_buy(metadata['pair']) == 1)
             ),
             'buy'] = 1
         return dataframe
@@ -333,14 +361,14 @@ class AutoRSIStrategy(IStrategy):
     @safe
     def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         self.rsi_max[metadata['pair']] = [[int(x) for x in s[0].split('-')]
-                                          for s in self.histograms[metadata['pair']] if s[1] >= 3][-1]
+                                          for s in self.histograms[metadata['pair']] if s[1] > 0][-1]
 
         self.reason[metadata['pair']] = 'sell_signal_rsi'
         dataframe.loc[
             (
                     (dataframe['volume'].gt(0)) &
                     (dataframe['rsi'].gt(self.rsi_max[metadata['pair']][0]))
-                    # & (dataframe['rsi'].lt(self.rsi_max[metadata['pair']][1]))
+                # & (dataframe['rsi'].lt(self.rsi_max[metadata['pair']][1]))
             ),
             'sell'] = 1
         return dataframe
