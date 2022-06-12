@@ -23,7 +23,7 @@ from user_data.strategies.tsl_settings import stoploss, use_sell_signal, trailin
 from user_data.strategies.Decorators import safe
 
 
-class AutoRSIStrategy(IStrategy):
+class AutoRSIStrategyTest(IStrategy):
     @safe
     def __init__(self, config: dict):
         super().__init__(config)
@@ -49,7 +49,7 @@ class AutoRSIStrategy(IStrategy):
         self.dca_rsi_history = {}
         self.dca_rsi_profit = {}
         self.dca_debug = False
-        #self.dca_wait_secs = 5 * 60
+        #self.dca_wait_secs = 1 * 60
         self.max_dca_orders = 3
         self.max_dca_multiplier = 5.5
         self.dca_koef = 1

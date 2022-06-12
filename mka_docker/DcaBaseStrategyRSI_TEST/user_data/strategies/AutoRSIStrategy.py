@@ -33,9 +33,9 @@ class AutoRSIStrategy(IStrategy):
         self.rsi_min = {}
         self.rsi_max = {}
         self.reason = {}
-        self.timeframe = '1m'
-        self.informative_timeframes = ['3m']
-        self.higher_timeframe = '3m'
+        self.timeframe = '1h'
+        self.informative_timeframes = ['1d']
+        self.higher_timeframe = '1d'
         self.minimal_roi = get_rois()
         self.stoploss = stoploss
         self.use_sell_signal = use_sell_signal
@@ -49,10 +49,10 @@ class AutoRSIStrategy(IStrategy):
         self.dca_rsi_history = {}
         self.dca_rsi_profit = {}
         self.dca_debug = False
-        self.dca_wait_secs = 5 * 60
+        #self.dca_wait_secs = 5 * 60
         self.max_dca_orders = 3
         self.max_dca_multiplier = 5.5
-        self.dca_koef = 0.5
+        self.dca_koef = 1
         self.dca_orders = {}
         self.profits = {}
         # end dca section
@@ -315,7 +315,7 @@ class AutoRSIStrategy(IStrategy):
         #         return True
 
         if 'trailing_stop_loss' == sell_reason:
-            self.block_pair(pair=pair, sell_reason=sell_reason, minutes=3)
+            #self.block_pair(pair=pair, sell_reason=sell_reason, minutes=3)
             if pr > 0.01:
                 return True
 
@@ -346,7 +346,7 @@ class AutoRSIStrategy(IStrategy):
             self.initial_buys[metadata['pair']] = 1
 
         self.rsi_min[metadata['pair']] = [[int(x) for x in s[0].split('-')]
-                                          for s in self.histograms[metadata['pair']] if s[1] > 0][0]
+                                          for s in self.histograms[metadata['pair']] if s[1] > 10][0]
         self.reason[metadata['pair']] = 'buy_signal_rsi'
         dataframe.loc[
             (
@@ -361,7 +361,7 @@ class AutoRSIStrategy(IStrategy):
     @safe
     def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
         self.rsi_max[metadata['pair']] = [[int(x) for x in s[0].split('-')]
-                                          for s in self.histograms[metadata['pair']] if s[1] > 0][-1]
+                                          for s in self.histograms[metadata['pair']] if s[1] > 3][-1]
 
         self.reason[metadata['pair']] = 'sell_signal_rsi'
         dataframe.loc[
