@@ -1,5 +1,4 @@
 def get_rois():
-    rois = {}
-    rois["0"]=0.01
+    rois = {"0": 0.30}
     return rois
 
