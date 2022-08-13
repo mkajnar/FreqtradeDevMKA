@@ -21,9 +21,11 @@ from user_data.strategies.tsl_settings import stoploss, use_sell_signal, trailin
     trailing_stop_positive_offset, trailing_stop, trailing_only_offset_is_reached
 
 from user_data.strategies.Decorators import safe
+from freqtrade.exchange import timeframe_to_minutes
+from freqtrade.strategy import IStrategy, stoploss_from_absolute
 
 
-class AutoRSIStrategy(IStrategy):
+class AutoRSIStrategyVer2(IStrategy):
     @safe
     def __init__(self, config: dict):
         super().__init__(config)
@@ -33,11 +35,13 @@ class AutoRSIStrategy(IStrategy):
         self.rsi_min = {}
         self.rsi_max = {}
         self.reason = {}
-        self.timeframe = '5m'
-        self.informative_timeframes = ['15m']
-        self.higher_timeframe = '15m'
-        self.minimal_roi = get_rois()
+        self.timeframe = '15m'
+        self.timeframe_mins = timeframe_to_minutes(self.timeframe)
+        self.informative_timeframes = ['5m', '15m', '30m', '1h']
+        self.higher_timeframe = '1h'
+        self.minimal_roi = get_rois(self.timeframe_mins)
         self.stoploss = stoploss
+        self.use_custom_stoploss = True
         self.use_sell_signal = use_sell_signal
         self.trailing_stop = trailing_stop
         self.trailing_stop_positive = trailing_stop_positive
@@ -57,8 +61,6 @@ class AutoRSIStrategy(IStrategy):
         self.profits = {}
         # end dca section
 
-        self.initial_buys = {}
-
         self.unfilledtimeout = {
             'buy': 60 * 3,
             'sell': 60 * 10
@@ -69,29 +71,6 @@ class AutoRSIStrategy(IStrategy):
             'stoploss': 'market',
             'stoploss_on_exchange': False
         }
-        self.plot_config = {
-            # "_main_plot": {
-            #     "tema": {},
-            #     "sar": {
-            #         "color": "white"
-            #     },
-            #     "sma9": {
-            #         "color": "#8dca58",
-            #         "type": "line"
-            #     },
-            #     "sma20": {
-            #         "color": "#62df8c",
-            #         "type": "line"
-            #     }
-            # },
-            "subplots": {
-                "RSI": {
-                    "rsi": {
-                        "color": "red"
-                    }
-                }
-            }
-        }
 
     # This is called when placing the initial order (opening trade)
     @safe
@@ -101,6 +80,13 @@ class AutoRSIStrategy(IStrategy):
         # We need to leave most of the funds for possible further DCA orders
         # This also applies to fixed stakes
         return proposed_stake / self.max_dca_multiplier
+
+    @safe
+    def custom_stoploss(self, pair: str, trade: 'Trade', current_time: datetime,
+                        current_rate: float, current_profit: float, **kwargs) -> float:
+        dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
+        candle = dataframe.iloc[-1].squeeze()
+        return stoploss_from_absolute(current_rate - (candle['atr'] * 75), current_rate, is_short=trade.is_short)
 
     @safe
     def adjust_trade_position(self, trade: Trade, current_time: datetime,
@@ -257,16 +243,85 @@ class AutoRSIStrategy(IStrategy):
     @safe
     def informative_pairs(self):
         pairs = self.dp.current_whitelist()
+        if "BTC/USDT" not in pairs:
+            pairs.append("BTC/USDT")
         informative_pairs = []
         for _ in self.informative_timeframes:
             informative_pairs.extend([(pair, _) for pair in pairs])
         return informative_pairs
 
+    @property
+    def plot_config(self):
+        """
+            There are a lot of solutions how to build the dictonary, hardcoded (as one big dictonary or add the elements one by one)
+            Example 1:
+                plot_config = {'main_plot': {}, 'subplots': {}}
+
+            Example 2:
+                plot_config = {}
+                plot_config['main_plot'] = {}
+                plot_config['subplots'] = {}
+                plot_config['main_plot']['sma'] = {}
+                plot_config['main_plot']['ema3'] = {}
+                plot_config['main_plot']['ema5'] = {'color': 'green'}
+                plot_config['subplots']['Other'] = {'macd': {'color': 'red'}, 'macdsignal': {'color': 'blue'}}
+
+            Example 3: (use functions. here we resample 4h candles to 1d and 1w).
+                plot_config = {}
+                plot_config['main_plot'] = {}
+                plot_config['subplots'] = {}
+                plot_config['main_plot']['ema50'] = {'color': 'green'}
+                plot_config['main_plot']['ema200'] = {'color': 'red'}
+                plot_config['subplots']['Forecast'] = {'macd': {'color': 'red'}, 'macdsignal': {'color': 'blue'}}
+                # some kind of append to the section.
+                plot_config['subplots']['Forecast'].update({f'resample_{timeframe_to_minutes(self.timeframe) * 6}_macd': {}, f'resample_{timeframe_to_minutes(self.timeframe) * 6}_macdsignal': {}})
+                plot_config['subplots']['Forecast'].update({f'resample_{timeframe_to_minutes(self.timeframe) * 6 * 7}_macd': {}, f'resample_{timeframe_to_minutes(self.timeframe) * 6 * 7}_macdsignal': {}})
+        """
+        plot_config = {}
+        plot_config['main_plot'] = {}
+        plot_config['main_plot']['ema20'] = {'color': 'yellow'}
+        plot_config['main_plot']['ema50'] = {'color': 'green'}
+        plot_config['main_plot']['ema200'] = {'color': 'red'}
+
+
+        plot_config['subplots'] = {}
+
+        plot_config['subplots']['BTC_EMA'] = {
+            'ema20_high': {'color': 'orange'},
+            'ema50_high': {'color': 'violet'},
+            'ema200_high': {'color': 'blue'}
+        }
+
+        plot_config['subplots']['MACD'] = {
+            'macd': {'color': 'yellow'},
+            'macdsignal': {'color': 'blue'},
+            'macdhist': {'color': 'orange'}
+        }
+
+        plot_config['subplots']['RSI'] = {"rsi": {"color": "red"}}
+        plot_config['subplots']['ATR'] = {"atr": {"color": "white"}}
+
+        return plot_config
+
     @safe
     def populate_indicators(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        # higher_dataframe = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe=self.higher_timeframe)
 
+        # higher_dataframe = self.dp.get_pair_dataframe(pair=metadata['pair'], timeframe=self.higher_timeframe)
+        higher_dataframe = self.dp.get_pair_dataframe(pair='BTC/USDT', timeframe=self.higher_timeframe)
+
+        dataframe['atr'] = ta.ATR(dataframe, timeperiod=14)
         dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
+        dataframe['ema20'] = ta.EMA(dataframe, timeperiod=20)
+        dataframe['ema50'] = ta.EMA(dataframe, timeperiod=50)
+        dataframe['ema200'] = ta.EMA(dataframe, timeperiod=200)
+        dataframe['ema20_high'] = ta.EMA(higher_dataframe, timeperiod=20)
+        dataframe['ema50_high'] = ta.EMA(higher_dataframe, timeperiod=50)
+        dataframe['ema200_high'] = ta.EMA(higher_dataframe, timeperiod=200)
+        macd = ta.MACD(dataframe, timeperiod=14)
+        dataframe['macd'] = macd['macd']
+        dataframe['macdsignal'] = macd['macdsignal']
+        dataframe['macdhist'] = macd['macdhist']
+
         # higher_dataframe['rsi'] = ta.RSI(higher_dataframe, timeperiod=14)
         # find min a max RSI values by quantile +/- 1%
         self.min_max_list[metadata['pair']] = [dataframe['rsi'].quantile(0.01), dataframe['rsi'].quantile(0.99)]
@@ -308,38 +363,19 @@ class AutoRSIStrategy(IStrategy):
             self.block_pair(pair=pair, sell_reason=sell_reason, minutes=60)
             return True
 
-        # if 'sell_signal_btc_down' == sell_reason:
-        #     if ((self.btc_rsi_hist[-1][0] + self.btc_rsi_hist[-1][1]) / 2 <= 50.0) and (
-        #             (self.btc_rsi_hist[-1][0] + self.btc_rsi_hist[-1][1]) / 2 <= 50.0):
-        #         self.block_pair(pair=pair, sell_reason=sell_reason, minutes=10)
-        #         return True
-
         if 'trailing_stop_loss' == sell_reason:
-            # self.block_pair(pair=pair, sell_reason=sell_reason, minutes=3)
+            self.block_pair(pair=pair, sell_reason=sell_reason, minutes=3)
             if pr > 0.01:
-                self.set_timed_initial_buy_signal(pair=pair, value=1, ts=60)
                 return True
 
         if 'exit_signal' == sell_reason:
             if pr > 0.10:
-                self.set_timed_initial_buy_signal(pair=pair, value=1, ts=60)
                 return True
 
         if 'roi' == sell_reason:
-            self.set_timed_initial_buy_signal(pair=pair, value=1, ts=15)
             return True
 
         return False
-
-    def set_timed_initial_buy_signal(self, pair, value, ts):
-        th = Thread(target=lambda: self.set_initial_buy(pair=pair, value=value, ts=ts))
-        th.start()
-
-    @safe
-    def set_initial_buy(self, pair, value, ts):
-        time.sleep(ts)
-        self.initial_buys[pair] = value
-        pass
 
     @safe
     def block_pair(self, pair, sell_reason, minutes):
@@ -347,45 +383,68 @@ class AutoRSIStrategy(IStrategy):
         self.lock_pair(pair=pair, until=_block_year, reason=sell_reason)
 
     @safe
-    def flip_initial_buy(self, pair):
-        if pair not in self.initial_buys.keys():
-            self.initial_buys[pair] = 0
-        result = self.initial_buys[pair]
+    def populate_entry_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
-        self.initial_buys[pair] = 0
-        return result
-
-    @safe
-    def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-
-        if metadata['pair'] not in self.initial_buys.keys():
-            self.set_timed_initial_buy_signal(pair=metadata['pair'], value=1, ts=10)
+        if 'initial_buy' not in dataframe.keys():
+            dataframe['initial_buy'] = 1
 
         self.rsi_min[metadata['pair']] = [[int(x) for x in s[0].split('-')]
                                           for s in self.histograms[metadata['pair']] if s[1] > 10][0]
 
-        self.reason[metadata['pair']] = 'buy_signal_rsi'
-        dataframe.loc[
-            (
-                    ((dataframe['volume'].gt(0)) &
-                        # (dataframe['rsi'].gt(self.rsi_min[metadata['pair']][0])) &
-                        (dataframe['rsi'].lt(self.rsi_min[metadata['pair']][1]))) |
-                    (self.flip_initial_buy(metadata['pair']) == 1)
-            ),
-            'enter_long'] = 1
+        self.reset_buy_signal(dataframe)
+        self.buy_rsi(dataframe, metadata)
+        self.buy_ema(dataframe, metadata)
+        self.buy_initial(dataframe, metadata)
+
         return dataframe
 
     @safe
-    def populate_sell_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
-        self.rsi_max[metadata['pair']] = [[int(x) for x in s[0].split('-')]
-                                          for s in self.histograms[metadata['pair']] if s[1] > 3][-1]
+    def reset_buy_signal(self, dataframe):
+        dataframe.loc[(), ['enter_long', 'enter_tag']] = (0, 'init')
 
-        self.reason[metadata['pair']] = 'sell_signal_rsi'
+    @safe
+    def buy_rsi(self, dataframe, metadata):
+        dataframe.loc[
+            (
+                (
+                        (dataframe['volume'].gt(0)) &
+                        (dataframe['rsi'].lt(self.rsi_min[metadata['pair']][1]))
+                )
+            ),
+            ['enter_long', 'enter_tag']] = (1, 'buy_signal_rsi')
+
+    @safe
+    def buy_ema(self, dataframe, metadata):
+        dataframe.loc[
+            (
+                (
+                        (dataframe['ema20'].gt(dataframe['ema50'])) &
+                        (dataframe['ema50'].gt(dataframe['ema200']))
+                )
+            ),
+            ['enter_long', 'enter_tag']] = (1, 'ema_buy_signal')
+
+    @safe
+    def buy_initial(self, dataframe, metadata):
+
+        dataframe.loc[
+            (
+                    (dataframe['open'].gt(0)) &
+                    (dataframe['initial_buy'].gt(0))
+            ),
+            ['enter_long', 'enter_tag']] = (1, 'initial_buy')
+        dataframe['initial_buy'] = 0
+
+    @safe
+    def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
+
+        self.rsi_max[metadata['pair']] = \
+            [[int(x) for x in s[0].split('-')] for s in self.histograms[metadata['pair']] if s[1] > 3][-1]
+
         dataframe.loc[
             (
                     (dataframe['volume'].gt(0)) &
                     (dataframe['rsi'].gt(self.rsi_max[metadata['pair']][0]))
-                # & (dataframe['rsi'].lt(self.rsi_max[metadata['pair']][1]))
             ),
-            'exit_long'] = 1
+            ['exit_long', 'exit_tag']] = (1, 'sell_signal_rsi')
         return dataframe
