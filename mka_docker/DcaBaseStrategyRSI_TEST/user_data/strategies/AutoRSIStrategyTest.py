@@ -33,9 +33,9 @@ class AutoRSIStrategyTest(IStrategy):
         self.rsi_min = {}
         self.rsi_max = {}
         self.reason = {}
-        self.timeframe = '1h'
-        self.informative_timeframes = ['1d']
-        self.higher_timeframe = '1d'
+        self.timeframe = '5m'
+        self.informative_timeframes = ['15m']
+        self.higher_timeframe = '15m'
         self.minimal_roi = get_rois()
         self.stoploss = stoploss
         self.use_sell_signal = use_sell_signal
@@ -49,7 +49,7 @@ class AutoRSIStrategyTest(IStrategy):
         self.dca_rsi_history = {}
         self.dca_rsi_profit = {}
         self.dca_debug = False
-        #self.dca_wait_secs = 1 * 60
+        # self.dca_wait_secs = 5 * 60
         self.max_dca_orders = 3
         self.max_dca_multiplier = 5.5
         self.dca_koef = 1
@@ -229,9 +229,6 @@ class AutoRSIStrategyTest(IStrategy):
             previous_candle = dataframe.iloc[-2].squeeze()
             return last_candle, previous_candle
         except:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print('{} - {} - {}'.format(exc_type, fname, exc_tb.tb_lineno))
             return None, None
 
     @safe
@@ -315,18 +312,31 @@ class AutoRSIStrategyTest(IStrategy):
         #         return True
 
         if 'trailing_stop_loss' == sell_reason:
-            #self.block_pair(pair=pair, sell_reason=sell_reason, minutes=3)
+            # self.block_pair(pair=pair, sell_reason=sell_reason, minutes=3)
             if pr > 0.01:
+                self.set_timed_initial_buy_signal(pair=pair, value=1, ts=1)
                 return True
 
         if 'exit_signal' == sell_reason:
             if pr > 0.10:
+                self.set_timed_initial_buy_signal(pair=pair, value=1, ts=1)
                 return True
 
         if 'roi' == sell_reason:
+            self.set_timed_initial_buy_signal(pair=pair, value=1, ts=1)
             return True
 
         return False
+
+    def set_timed_initial_buy_signal(self, pair, value, ts):
+        th = Thread(target=lambda: self.set_initial_buy(pair=pair, value=value, ts=ts))
+        th.start()
+
+    @safe
+    def set_initial_buy(self, pair, value, ts):
+        time.sleep(ts)
+        self.initial_buys[pair] = value
+        pass
 
     @safe
     def block_pair(self, pair, sell_reason, minutes):
@@ -335,7 +345,10 @@ class AutoRSIStrategyTest(IStrategy):
 
     @safe
     def flip_initial_buy(self, pair):
+        if pair not in self.initial_buys.keys():
+            self.initial_buys[pair] = 0
         result = self.initial_buys[pair]
+
         self.initial_buys[pair] = 0
         return result
 
@@ -343,17 +356,18 @@ class AutoRSIStrategyTest(IStrategy):
     def populate_buy_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
 
         if metadata['pair'] not in self.initial_buys.keys():
-            self.initial_buys[metadata['pair']] = 1
+            self.set_timed_initial_buy_signal(pair=metadata['pair'], value=1, ts=0.1)
 
         self.rsi_min[metadata['pair']] = [[int(x) for x in s[0].split('-')]
                                           for s in self.histograms[metadata['pair']] if s[1] > 10][0]
+
         self.reason[metadata['pair']] = 'buy_signal_rsi'
         dataframe.loc[
             (
                     ((dataframe['volume'].gt(0)) &
-                     # (dataframe['rsi'].gt(self.rsi_min[metadata['pair']][0])) &
-                     (dataframe['rsi'].lt(self.rsi_min[metadata['pair']][1]))) |
-                    (self.flip_initial_buy(metadata['pair']) == 1)
+                        # (dataframe['rsi'].gt(self.rsi_min[metadata['pair']][0])) &
+                        (dataframe['rsi'].lt(self.rsi_min[metadata['pair']][1])))
+                    #| (self.flip_initial_buy(metadata['pair']) == 1)
             ),
             'buy'] = 1
         return dataframe
