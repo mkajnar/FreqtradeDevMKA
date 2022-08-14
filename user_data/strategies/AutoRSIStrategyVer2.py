@@ -288,9 +288,9 @@ class AutoRSIStrategyVer2(IStrategy):
         plot_config['subplots'] = {}
 
         plot_config['subplots']['BTC_EMA'] = {
-            'ema20_high': {'color': 'orange'},
-            'ema50_high': {'color': 'violet'},
-            'ema200_high': {'color': 'blue'}
+            'ema20_high_btc': {'color': 'orange'},
+            'ema50_high_btc': {'color': 'violet'},
+            'ema200_high_btc': {'color': 'blue'}
         }
 
         # plot_config['subplots']['MACD'] = {
@@ -315,9 +315,9 @@ class AutoRSIStrategyVer2(IStrategy):
         dataframe['ema20'] = ta.EMA(dataframe, timeperiod=20)
         dataframe['ema50'] = ta.EMA(dataframe, timeperiod=50)
         dataframe['ema200'] = ta.EMA(dataframe, timeperiod=200)
-        dataframe['ema20_high'] = ta.EMA(higher_dataframe, timeperiod=20)
-        dataframe['ema50_high'] = ta.EMA(higher_dataframe, timeperiod=50)
-        dataframe['ema200_high'] = ta.EMA(higher_dataframe, timeperiod=200)
+        dataframe['ema20_high_btc'] = ta.EMA(higher_dataframe, timeperiod=20)
+        dataframe['ema50_high_btc'] = ta.EMA(higher_dataframe, timeperiod=50)
+        dataframe['ema200_high_btc'] = ta.EMA(higher_dataframe, timeperiod=200)
         macd = ta.MACD(dataframe, timeperiod=14)
         dataframe['macd'] = macd['macd']
         dataframe['macdsignal'] = macd['macdsignal']
@@ -395,7 +395,7 @@ class AutoRSIStrategyVer2(IStrategy):
             dataframe['initial_buy'] = 1
 
         self.rsi_min[metadata['pair']] = [[int(x) for x in s[0].split('-')]
-                                          for s in self.histograms[metadata['pair']] if s[1] > 10][0]
+                                          for s in self.histograms[metadata['pair']] if s[1] > 20][0]
 
         self.reset_buy_signal(dataframe)
         self.buy_rsi(dataframe, metadata)
@@ -414,9 +414,9 @@ class AutoRSIStrategyVer2(IStrategy):
 
     @safe
     def btc_high_guard(self, dataframe):
-        return (dataframe['ema20_high'] > dataframe['ema50_high']) & (
-                    dataframe['ema50_high'] > dataframe['ema200_high']) & (
-                           dataframe['ema20_high'] > dataframe['ema20_high'].shift(1))
+        return (dataframe['ema20_high_btc'] > dataframe['ema50_high_btc']) & (
+                    dataframe['ema50_high_btc'] > dataframe['ema200_high_btc']) & (
+                           dataframe['ema20_high_btc'] > dataframe['ema20_high_btc'].shift(1))
 
     @safe
     def buy_rsi(self, dataframe, metadata):
@@ -453,8 +453,9 @@ class AutoRSIStrategyVer2(IStrategy):
                         self.btc_high_guard(dataframe)
                 )
             ),
-            ['enter_long', 'enter_tag']] = (1, 'initial_buy')
-        dataframe['initial_buy'] = 0
+            ['enter_long', 'enter_tag', 'initial_buy']] = (1, 'initial_buy', 0)
+
+        print(f'Checked initial buy for {metadata["pair"]}')
 
     @safe
     def populate_exit_trend(self, dataframe: DataFrame, metadata: dict) -> DataFrame:
