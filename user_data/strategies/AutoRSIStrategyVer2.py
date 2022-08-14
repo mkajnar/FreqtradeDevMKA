@@ -35,7 +35,7 @@ class AutoRSIStrategyVer2(IStrategy):
         self.rsi_min = {}
         self.rsi_max = {}
         self.reason = {}
-        self.timeframe = '15m'
+        self.timeframe = '30m'
         self.timeframe_mins = timeframe_to_minutes(self.timeframe)
         self.informative_timeframes = ['5m', '15m', '30m', '1h']
         self.higher_timeframe = '1h'
@@ -282,6 +282,8 @@ class AutoRSIStrategyVer2(IStrategy):
         plot_config['main_plot']['ema20'] = {'color': 'yellow'}
         plot_config['main_plot']['ema50'] = {'color': 'green'}
         plot_config['main_plot']['ema200'] = {'color': 'red'}
+        plot_config['main_plot']['tema'] = {'color': 'orange'}
+        plot_config['main_plot']['bb_middleband'] = {'color': 'violet'}
 
         plot_config['subplots'] = {}
 
