@@ -40,9 +40,11 @@ class AutoRSIStrategyVer2(IStrategy):
         self.informative_timeframes = ['5m', '15m', '30m', '1h']
         self.higher_timeframe = '1h'
         self.minimal_roi = get_rois(self.timeframe_mins)
+        self.ignore_roi_if_entry_signal = True
         self.stoploss = stoploss
         self.use_custom_stoploss = True
         self.use_sell_signal = use_sell_signal
+        self.use_exit_signal = True
         self.trailing_stop = trailing_stop
         self.trailing_stop_positive = trailing_stop_positive
         self.trailing_stop_positive_offset = trailing_stop_positive_offset
@@ -79,6 +81,9 @@ class AutoRSIStrategyVer2(IStrategy):
                             entry_tag: Optional[str], side: str, **kwargs) -> float:
         # We need to leave most of the funds for possible further DCA orders
         # This also applies to fixed stakes
+        dataframe, _ = self.dp.get_analyzed_dataframe(pair=pair, timeframe=self.timeframe)
+        current_candle = dataframe.iloc[-1].squeeze()
+
         return proposed_stake / self.max_dca_multiplier
 
     @safe
@@ -87,6 +92,26 @@ class AutoRSIStrategyVer2(IStrategy):
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
         candle = dataframe.iloc[-1].squeeze()
         return stoploss_from_absolute(current_rate - (candle['atr'] * 75), current_rate, is_short=trade.is_short)
+
+    @safe
+    def custom_exit(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float,
+                    current_profit: float, **kwargs):
+        dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
+        last_candle = dataframe.iloc[-1].squeeze()
+
+        # Above 20% profit, sell when rsi < 80
+        if current_profit > 0.2:
+            if last_candle['rsi'] < 80:
+                return 'rsi_below_80'
+
+        # Between 2% and 10%, sell if EMA-long above EMA-short
+        if 0.05 < current_profit < 0.1:
+            if last_candle['emalong'] > last_candle['emashort']:
+                return 'ema_long_below_80'
+
+        # Sell any positions at a loss if they are held for more than one day.
+        # if current_profit < 0.0 and (current_time - trade.open_date_utc).days >= 1:
+        #     return 'unclog'
 
     @safe
     def adjust_trade_position(self, trade: Trade, current_time: datetime,
@@ -312,12 +337,17 @@ class AutoRSIStrategyVer2(IStrategy):
 
         dataframe['atr'] = ta.ATR(dataframe, timeperiod=14)
         dataframe['rsi'] = ta.RSI(dataframe, timeperiod=14)
+
+        dataframe['emalong'] = ta.EMA(dataframe, timeperiod=20, price='close')
+        dataframe['emashort'] = ta.EMA(dataframe, timeperiod=10, price='close')
+
         dataframe['ema20'] = ta.EMA(dataframe, timeperiod=20)
         dataframe['ema50'] = ta.EMA(dataframe, timeperiod=50)
         dataframe['ema200'] = ta.EMA(dataframe, timeperiod=200)
         dataframe['ema20_high_btc'] = ta.EMA(higher_dataframe, timeperiod=20)
         dataframe['ema50_high_btc'] = ta.EMA(higher_dataframe, timeperiod=50)
         dataframe['ema200_high_btc'] = ta.EMA(higher_dataframe, timeperiod=200)
+
         macd = ta.MACD(dataframe, timeperiod=14)
         dataframe['macd'] = macd['macd']
         dataframe['macdsignal'] = macd['macdsignal']
@@ -415,8 +445,8 @@ class AutoRSIStrategyVer2(IStrategy):
     @safe
     def btc_high_guard(self, dataframe):
         return (dataframe['ema20_high_btc'] > dataframe['ema50_high_btc']) & (
-                    dataframe['ema50_high_btc'] > dataframe['ema200_high_btc']) & (
-                           dataframe['ema20_high_btc'] > dataframe['ema20_high_btc'].shift(1))
+                dataframe['ema50_high_btc'] > dataframe['ema200_high_btc']) & (
+                       dataframe['ema20_high_btc'] > dataframe['ema20_high_btc'].shift(1))
 
     @safe
     def buy_rsi(self, dataframe, metadata):
@@ -449,8 +479,9 @@ class AutoRSIStrategyVer2(IStrategy):
             (
                 (
                         (dataframe['open'].gt(0)) &
-                        (dataframe['initial_buy'].gt(0)) &
-                        self.btc_high_guard(dataframe)
+                        (dataframe['initial_buy'].gt(0))
+                    # &
+                    # self.btc_high_guard(dataframe)
                 )
             ),
             ['enter_long', 'enter_tag', 'initial_buy']] = (1, 'initial_buy', 0)
