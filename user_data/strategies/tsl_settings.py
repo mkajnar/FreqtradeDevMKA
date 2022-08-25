@@ -1,6 +1,6 @@
-stoploss = -0.5
-use_sell_signal = True
+stoploss = -0.50
+use_sell_signal = False
 trailing_stop = True
-trailing_stop_positive = 0.005
-trailing_stop_positive_offset = 0.035
+trailing_stop_positive = 0.004
+trailing_stop_positive_offset = 0.005
 trailing_only_offset_is_reached = False

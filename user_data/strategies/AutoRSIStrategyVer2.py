@@ -35,10 +35,10 @@ class AutoRSIStrategyVer2(IStrategy):
         self.rsi_min = {}
         self.rsi_max = {}
         self.reason = {}
-        self.timeframe = '30m'
+        self.timeframe = '1m'
         self.timeframe_mins = timeframe_to_minutes(self.timeframe)
-        self.informative_timeframes = ['5m', '15m', '30m', '1h']
-        self.higher_timeframe = '1h'
+        self.informative_timeframes = ['5m']
+        self.higher_timeframe = '5m'
         self.minimal_roi = get_rois(self.timeframe_mins)
         self.ignore_roi_if_entry_signal = True
         self.stoploss = stoploss
@@ -55,7 +55,7 @@ class AutoRSIStrategyVer2(IStrategy):
         self.dca_rsi_history = {}
         self.dca_rsi_profit = {}
         self.dca_debug = False
-        # self.dca_wait_secs = 5 * 60
+        self.dca_wait_secs = 30 * 60
         self.max_dca_orders = 3
         self.max_dca_multiplier = 5.5
         self.dca_koef = 1
@@ -64,8 +64,8 @@ class AutoRSIStrategyVer2(IStrategy):
         # end dca section
 
         self.unfilledtimeout = {
-            'buy': 60 * 3,
-            'sell': 60 * 10
+            'buy': 30,
+            'sell': 30
         }
         self.order_types = {
             'buy': 'market',
@@ -91,23 +91,23 @@ class AutoRSIStrategyVer2(IStrategy):
                         current_rate: float, current_profit: float, **kwargs) -> float:
         dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
         candle = dataframe.iloc[-1].squeeze()
-        return stoploss_from_absolute(current_rate - (candle['atr'] * 75), current_rate, is_short=trade.is_short)
+        return stoploss_from_absolute(current_rate - (candle['atr'] * 300), current_rate, is_short=trade.is_short)
 
-    @safe
-    def custom_exit(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float,
-                    current_profit: float, **kwargs):
-        dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
-        last_candle = dataframe.iloc[-1].squeeze()
+    #@safe
+    #def custom_exit(self, pair: str, trade: 'Trade', current_time: 'datetime', current_rate: float,
+    #                current_profit: float, **kwargs):
+    #    dataframe, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
+    #    last_candle = dataframe.iloc[-1].squeeze()
 
         # Above 20% profit, sell when rsi < 80
-        if current_profit > 0.2:
-            if last_candle['rsi'] < 80:
-                return 'rsi_below_80'
+    #    if current_profit > 0.2:
+    #        if last_candle['rsi'] < 80:
+    #            return 'rsi_below_80'
 
         # Between 2% and 10%, sell if EMA-long above EMA-short
-        if 0.05 < current_profit < 0.1:
-            if last_candle['emalong'] > last_candle['emashort']:
-                return 'ema_long_below_80'
+    #    if 0.05 < current_profit < 0.1:
+    #        if last_candle['emalong'] > last_candle['emashort']:
+    #            return 'ema_long_below_80'
 
         # Sell any positions at a loss if they are held for more than one day.
         # if current_profit < 0.0 and (current_time - trade.open_date_utc).days >= 1:
@@ -158,20 +158,22 @@ class AutoRSIStrategyVer2(IStrategy):
 
                 if trade.pair not in self.dca_rsi_history.keys():
                     self.dca_rsi_history[trade.pair] = []
+
                 if trade.pair not in self.dca_rsi_profit.keys():
                     self.dca_rsi_profit[trade.pair] = []
 
-                # if trade.pair in self.dca_orders.keys():
-                #     t = (datetime.datetime.now() - self.dca_orders[trade.pair]["changed"])
-                #     if t.total_seconds() <= self.dca_wait_secs:
-                #         return None
-                # else:
-                #     dca_item = {"current_rate": current_rate, "current_profit": current_profit,
-                #                 "stake_amount": filled_buys[0].cost, "changed": datetime.datetime.now(), "saved": False}
-                #
-                #     self.dca_orders[trade.pair] = dca_item
-                #     self.save_dca_orders()
-                #     return None
+                if trade.pair in self.dca_orders.keys():
+                    t = (datetime.datetime.now() - self.dca_orders[trade.pair]["changed"])
+                    if t.total_seconds() <= self.dca_wait_secs:
+                        print(f'DCA Wait for {trade.pair}')
+                        return None
+                else:
+                    dca_item = {"current_rate": current_rate, "current_profit": current_profit,
+                                "stake_amount": filled_buys[0].cost, "changed": datetime.datetime.now(), "saved": False}
+                    self.dca_orders[trade.pair] = dca_item
+                    self.save_dca_orders()
+                    print(f'DCA Wait for {trade.pair}')
+                    return None
 
                 if not self.dca_debug:
 
@@ -191,8 +193,8 @@ class AutoRSIStrategyVer2(IStrategy):
                     self.save_last_rsi(last_candle, trade)
                     self.save_last_profit(current_profit, trade)
 
-                    if last_candle['close'] < previous_candle['close']:
-                        return None
+                if last_candle['close'] < previous_candle['close']:
+                    return None
 
                 if 0 < count_of_buys <= self.max_dca_orders:
                     try:
@@ -209,6 +211,7 @@ class AutoRSIStrategyVer2(IStrategy):
                         self.dca_orders[trade.pair] = dca_item
                         # ulozit hned na disk
                         self.save_dca_orders()
+                        self.block_pair(pair=trade.pair, sell_reason='dca_buy', minutes=10)
                         return stake_amount
                     except:
                         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -400,16 +403,18 @@ class AutoRSIStrategyVer2(IStrategy):
             return True
 
         if 'trailing_stop_loss' == sell_reason:
-            self.block_pair(pair=pair, sell_reason=sell_reason, minutes=3)
             if pr > 0.01:
+                self.block_pair(pair=pair, sell_reason=sell_reason, minutes=3)
                 return True
+
 
         if 'exit_signal' == sell_reason:
             if pr > 0.10:
                 return True
 
         if 'roi' == sell_reason:
-            return True
+            if pr > 0.01:
+                return True
 
         return False
 
@@ -430,7 +435,7 @@ class AutoRSIStrategyVer2(IStrategy):
         self.reset_buy_signal(dataframe)
         self.buy_rsi(dataframe, metadata)
         self.buy_ema(dataframe, metadata)
-        self.buy_initial(dataframe, metadata)
+        #self.buy_initial(dataframe, metadata)
 
         return dataframe
 
@@ -454,8 +459,8 @@ class AutoRSIStrategyVer2(IStrategy):
             (
                 (
                         (dataframe['volume'].gt(0)) &
-                        (dataframe['rsi'].lt(self.rsi_min[metadata['pair']][1])) &
-                        self.tema_guard(dataframe)
+                        (dataframe['rsi'].lt(40)) #&
+                        #self.tema_guard(dataframe)
                 )
             ),
             ['enter_long', 'enter_tag']] = (1, 'buy_signal_rsi')
@@ -465,9 +470,10 @@ class AutoRSIStrategyVer2(IStrategy):
         dataframe.loc[
             (
                 (
-                        (dataframe['ema20'].gt(dataframe['ema50'])) &
-                        (dataframe['ema50'].gt(dataframe['ema200'])) &
-                        self.btc_high_guard(dataframe)
+                        (dataframe['ema20'].gt(dataframe['ema50']))
+                        # &
+                        #(dataframe['ema50'].gt(dataframe['ema50'])) &
+                        #self.btc_high_guard(dataframe)
                 )
             ),
             ['enter_long', 'enter_tag']] = (1, 'ema_buy_signal')

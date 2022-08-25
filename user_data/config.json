@@ -1,18 +1,18 @@
 {
-  "max_open_trades": 2,
+  "max_open_trades": 47,
   "stake_currency": "USDT",
   "stake_amount": "unlimited",
-  "tradable_balance_ratio": 0.99,
+  "tradable_balance_ratio": 0.85,
   "fiat_display_currency": "USD",
-  "timeframe": "15m",
+  "timeframe": "1m",
   "dry_run": true,
-  "dry_run_wallet": 3000,
+  "dry_run_wallet": 1500,
   "cancel_open_orders_on_exit": false,
   "position_adjustment_enable": true,
   "unfilledtimeout": {
-    "buy": 3,
-    "sell": 10,
-    "unit": "minutes"
+    "buy": 30,
+    "sell": 30,
+    "unit": "seconds"
   },
   "bid_strategy": {
     "price_side": "ask",
@@ -36,14 +36,66 @@
     "password": "",
     "ccxt_config": {
       "enableRateLimit": false,
-      "timeout": 60000
+      "timeout": 60000,
+      "_urls": {
+        "api": {
+          "public": "",
+          "private": ""
+        }
+      }
     },
     "ccxt_async_config": {
       "enableRateLimit": false,
       "timeout": 60000
     },
     "pair_whitelist": [
-      "BTC/USDT","ETH/USDT"
+      "BTC/USDT",
+      "ETH/USDT",
+      "AGIX/USDT",
+      "BNT/USDT",
+      "CRPT/USDT",
+      "MHC/USDT",
+      "DAG/USDT",
+      "GO/USDT",
+      "ABBC/USDT",
+      "BNS/USDT",
+      "APL/USDT",
+      "ETN/USDT",
+      "KNC/USDT",
+      "OXT/USDT",
+      "ATA/USDT",
+      "DORA/USDT",
+      "IOST/USDT",
+      "ANKR/USDT",
+      "COV/USDT",
+      "NIM/USDT",
+      "CELO/USDT",
+      "AVA/USDT",
+      "DGB/USDT",
+      "DEXE/USDT",
+      "BAX/USDT",
+      "CREAM/USDT",
+      "DASH/USDT",
+      "BADGER/USDT",
+      "BAKE/USDT",
+      "BEPRO/USDT",
+      "BAL/USDT",
+      "AKRO/USDT",
+      "CBC/USDT",
+      "ETC/USDT",
+      "KAI/USDT",
+      "ADS/USDT",
+      "HYVE/USDT",
+      "ARRR/USDT",
+      "OCEAN/USDT",
+      "ACA/USDT",
+      "LTO/USDT",
+      "CTSI/USDT",
+      "DATA/USDT",
+      "LYM/USDT",
+      "LMR/USDT",
+      "BOLT/USDT",
+      "ERG/USDT"
     ],
     "pair_blacklist": [
       // Exchange Tokens
@@ -68,13 +120,13 @@
   "_pairlists": [
     {
       "method": "VolumePairList",
-      "number_assets": 100,
+      "number_assets": 150,
       "sort_key": "quoteVolume",
       "refresh_period": 1440
     },
     {
       "method": "AgeFilter",
-      "min_days_listed": 7
+      "min_days_listed": 1
     },
     {
       "method": "PerformanceFilter"
@@ -94,21 +146,8 @@
       "max_spread_ratio": 0.005
     },
     {
-      "method": "RangeStabilityFilter",
-      "lookback_days": 7,
-      "min_rate_of_change": 0.001,
-      "refresh_period": 1440
-    },
-    {
-      "method": "VolatilityFilter",
-      "lookback_days": 7,
-      "min_volatility": 0.005,
-      "max_volatility": 1,
-      "refresh_period": 300
-    },
-    {
       "method": "VolumePairList",
-      "number_assets": 100,
+      "number_assets": 150,
       "sort_key": "quoteVolume"
     }
   ],
@@ -142,7 +181,7 @@
     "max_trade_duration_minute": 1440,
     "remove_pumps": false
   },
-  "telegram": {
+  "_telegram": {
     "enabled": false,
     "token": "",
     "chat_id": "",
@@ -197,7 +236,7 @@
     "jwt_secret_key": "54f004bd1a038952be7a2c37c5bbbdfd0491b769a75ef692a49f745d283cb905",
     "CORS_origins": [],
     "username": "freqtrade",
-    "password": "freqtrade"
+    "password": "Cac8Deal"
   },
   "bot_name": "freqtrade",
   "initial_state": "running",
