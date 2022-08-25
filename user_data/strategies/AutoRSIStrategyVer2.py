@@ -65,8 +65,10 @@ class AutoRSIStrategyVer2(IStrategy):
 
         self.unfilledtimeout = {
             'buy': 30,
-            'sell': 30
+            'sell': 30,
+            'unit': 'seconds'
         }
+
         self.order_types = {
             'buy': 'market',
             'sell': 'market',
