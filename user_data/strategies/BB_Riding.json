@@ -1,0 +1,26 @@
+{
+  "strategy_name": "BB_Riding",
+  "params": {
+    "trailing": {
+      "trailing_stop": true,
+      "trailing_stop_positive": 0.005,
+      "trailing_stop_positive_offset": 0.045,
+      "trailing_only_offset_is_reached": true
+    },
+    "buy": {
+      "buy_dca_percent": -0.05,
+      "buy_rebuy_divider": 2,
+      "buy_rebuy_koef": 1.7
+    },
+    "sell": {},
+    "protection": {},
+    "roi": {
+      "0": 0.05
+    },
+    "stoploss": {
+      "stoploss": -0.7
+    }
+  },
+  "ft_stratparam_v": 1,
+  "export_time": "2022-09-22 22:18:44.586651+00:00"
+}
